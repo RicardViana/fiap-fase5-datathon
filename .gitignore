@@ -1,6 +1,7 @@
 # Manual
 #/data
 *.mp4
+*.bat
 
 # Mac OS-specific storage files
 .DS_Store
