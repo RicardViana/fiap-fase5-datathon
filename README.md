@@ -1,61 +1,178 @@
-# 🧠 Modelo de Machine Learning para a análise de risco de defasagem
+# 🧠 Modelo de Machine Learning para Análise de Risco de Defasagem
 
-[![CCDS](https://img.shields.io/badge/CCDS-Project%20template-328F97?logo=cookiecutter)](https://cookiecutter-data-science.drivendata.org/) ![Python](https://img.shields.io/badge/Python-3.9-blue) ![Status](https://img.shields.io/badge/Status-Em%20Desenvolvimento-yellow)
+## Datathon – Fase 5 | Associação Passos Mágicos
 
+[![Python](https://img.shields.io/badge/Python-3.9-blue)]()
+![Status](https://img.shields.io/badge/Status-Concluído-success)
+
+---
 
 ## 📋 Sobre o Projeto
 
-## 🎯 Objetivos do Projeto
+Este projeto foi desenvolvido no contexto do **Datathon – Fase 5**, promovido pela Pós-Tech em Data Analytics, utilizando a base de dados educacionais da Associação **Passos Mágicos**.
+
+A proposta consiste em realizar uma análise exploratória e preditiva sobre indicadores educacionais e psicossociais de alunos em situação de vulnerabilidade social, com o objetivo de:
+
+* Identificar padrões de defasagem
+* Analisar evolução de desempenho ao longo dos anos
+* Construir um modelo preditivo de risco
+* Apoiar decisões estratégicas da instituição
+
+---
 
 ## 🏥 Contexto do Problema
 
+A Associação Passos Mágicos atua há mais de 30 anos transformando a vida de crianças e jovens por meio da educação.
+
+O desafio proposto no Datathon envolve analisar dados educacionais dos anos de:
+
+* 2022
+* 2023
+* 2024
+
+Os indicadores analisados incluem:
+
+* **IAN** – Índice de Adequação de Nível
+* **IDA** – Índice de Desempenho Acadêmico
+* **IEG** – Índice de Engajamento
+* **IAA** – Índice de Autoavaliação
+* **IPS** – Índice Psicossocial
+* **IPP** – Índice Psicopedagógico
+* **IPV** – Índice de Ponto de Virada
+* **INDE** – Índice Global do Aluno
+
+O objetivo central foi responder às dores de negócio e desenvolver um modelo capaz de prever o risco de defasagem antes que ele aconteça.
+
+---
+
+## 🎯 Objetivos do Projeto
+
+### 🔎 Análise Exploratória
+
+* Avaliar a evolução do IAN ao longo do tempo
+* Identificar tendências no IDA
+* Verificar relação entre engajamento (IEG) e desempenho (IDA/IPV)
+* Analisar coerência entre autoavaliação (IAA) e desempenho real
+* Investigar padrões psicossociais (IPS) associados à queda de desempenho
+* Avaliar multidimensionalidade dos indicadores
+
+### 🤖 Modelagem Preditiva
+
+* Criar variável target de risco de defasagem
+* Realizar feature engineering
+* Separar dados em treino e teste
+* Treinar modelo de **Perceptron de Múltiplas Camadas (MLPClassifier)**
+* Avaliar métricas de desempenho
+* Gerar probabilidade de risco para cada aluno
+
+---
+
+## 🧪 Metodologia
+
+A modelagem seguiu as seguintes etapas:
+
+### 1️⃣ Pré-processamento
+
+* Tratamento de valores ausentes
+* Padronização com `StandardScaler`
+* Seleção de variáveis relevantes
+
+### 2️⃣ Feature Engineering
+
+* Criação de variável binária de risco
+* Combinação de indicadores multidimensionais
+* Normalização dos dados
+
+### 3️⃣ Separação dos Dados
+
+* `train_test_split`
+* Estratificação da variável target
+
+### 4️⃣ Modelagem
+
+Foi utilizado:
+
+```python
+MLPClassifier(hidden_layer_sizes=(100, 50),
+              activation='relu',
+              solver='adam',
+              max_iter=500,
+              random_state=42)
+```
+
+Modelo baseado em rede neural artificial (Perceptron Multicamadas).
+
+### 5️⃣ Avaliação
+
+* Accuracy
+* Precision
+* Recall
+* F1-Score
+* Matriz de Confusão
+* Análise de probabilidade de risco
+
+---
+
+## 📊 Principais Insights Analíticos
+
+* Alunos com **baixo IEG + baixo IPS** apresentam maior probabilidade de queda no IDA.
+* Existe correlação moderada entre IAA e desempenho real.
+* O IPV é fortemente influenciado por engajamento contínuo.
+* A combinação **IDA + IEG + IPS** é um forte preditor do INDE.
+* Padrões psicossociais antecedem quedas acadêmicas.
+
+---
+
 ## 🚀 Aplicação no Streamlit
 
-## 📘 Documentação no MkDocs
+Foi desenvolvida uma aplicação em **Streamlit** para permitir que a Passos Mágicos:
 
-Este documento descreve a organização das pastas e a finalidade dos arquivos de configuração encontrados neste repositório.
+* Insira indicadores do aluno
+* Obtenha probabilidade de risco
+* Visualize classificação preditiva
+* Apoie tomada de decisão pedagógica
 
-## 🗂 Estrutura do Projeto
+Deploy realizado via Streamlit Community Cloud.
 
-A organização segue o padrão **Cookiecutter Data Science**, com pequenas adaptações:
+---
+
+## 📈 Estrutura do Projeto
+
+A organização segue o padrão **Cookiecutter Data Science**, adaptado ao Datathon:
 
 ```
 ├── .streamlit/
 │   └── config.toml
 ├── data/
 │   ├── raw/
-│   │   └── Obesity.csv
 │   ├── processed/
-│   │   └── base_limpa.csv
 │   ├── interim/
 │   └── external/
 ├── docs/
-│   ├── getting-started.md
-│   ├── index.md
-│   └── modelagem.md
 ├── models/
-│   └── modelo_risco_obesidade_random_forest.joblib
+│   └── modelo_risco_defasagem_mlp.joblib
 ├── notebooks/
-│   └── tech_challenge_codigo.ipynb
+│   └── Perceptron de múltiplas camadas.ipynb
 ├── references/
-│   ├── dicionario_obesity_fiap.pdf
-│   └── POSTECH - Tech Challenge - Fase 4 - Data Analytics_.pdf
+│   └── POSTECH - DTAT - Datathon - Fase 5.pdf
 ├── reports/
-├── environment.yaml
-├── requirements.txt
-├── mkdocs.yml
 ├── app.py
-├── LICENSE
+├── requirements.txt
 └── README.md
 ```
 
-## 📊 Dados
+---
 
-O dicionário de dados utilizado está disponível na pasta `references/`. As variáveis incluem:
+## 📘 Documentação
 
-## 🧪 Metodologia
+A documentação técnica inclui:
 
-## 📈 Dashboard Analítico
+* Explicação das variáveis
+* Pipeline de modelagem
+* Estratégia de validação
+* Justificativa da escolha do modelo MLP
+
+---
 
 ## 👨‍💻 Equipe
 
@@ -64,6 +181,18 @@ O dicionário de dados utilizado está disponível na pasta `references/`. As va
 * [Lucas Augusto Fernandes de Lira](https://www.linkedin.com/in/lucas--lira-/)
 * [Mariana Domingues Brandão](https://www.linkedin.com/in/maridbrandao)
 * [Ricardo Vieira Viana](https://www.linkedin.com/in/ricardvviana)
+---
+
+## 📌 Conclusão
+
+O modelo desenvolvido permite:
+
+* Antecipar risco de defasagem
+* Apoiar decisões pedagógicas
+* Identificar padrões críticos
+* Gerar impacto social real
+
+O projeto combina **análise estatística, storytelling e Machine Learning aplicado ao terceiro setor**, reforçando o papel da ciência de dados como ferramenta de transformação social.
 
 ---
 
