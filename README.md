@@ -1,6 +1,6 @@
 # 🧠 Modelo de Machine Learning para a análise de risco de defasagem
 
-[![CCDS](https://img.shields.io/badge/CCDS-Project%20template-328F97?logo=cookiecutter)](https://cookiecutter-data-science.drivendata.org/) ![Python](https://img.shields.io/badge/Python-3.10-blue) ![Status](https://img.shields.io/badge/Status-Em%20Desenvolvimento-yellow)
+[![CCDS](https://img.shields.io/badge/CCDS-Project%20template-328F97?logo=cookiecutter)](https://cookiecutter-data-science.drivendata.org/) ![Python](https://img.shields.io/badge/Python-3.9-blue) ![Status](https://img.shields.io/badge/Status-Em%20Desenvolvimento-yellow)
 
 
 ## 📋 Sobre o Projeto
