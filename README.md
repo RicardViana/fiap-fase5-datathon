@@ -1,9 +1,8 @@
 # 🧠 Modelo de Machine Learning para Análise de Risco de Defasagem
 
-## Datathon – Fase 5 | Associação Passos Mágicos
-
-[![Python](https://img.shields.io/badge/Python-3.9-blue)]()
-![Status](https://img.shields.io/badge/Status-Concluído-success)
+[![CCDS](https://img.shields.io/badge/CCDS-Project%20template-328F97?logo=cookiecutter)](https://cookiecutter-data-science.drivendata.org/) 
+![Python](https://img.shields.io/badge/Python-3.9-blue) 
+![Status](https://img.shields.io/badge/Status-Em%20Desenvolvimento-yellow)
 
 ---
 
@@ -193,8 +192,6 @@ O modelo desenvolvido permite:
 * Gerar impacto social real
 
 O projeto combina **análise estatística, storytelling e Machine Learning aplicado ao terceiro setor**, reforçando o papel da ciência de dados como ferramenta de transformação social.
-
----
 
 ## 📜 Licença
 
