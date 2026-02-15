@@ -1,14 +1,7 @@
 # Importar biblioteca completa - padrão
-import io
-import unicodedata
 
 # Importar biblioteca completa - terceiro
 import joblib
-import matplotlib.pyplot as plt
-import numpy as np
-import pandas as pd
-import requests
-import shap
 import streamlit as st
 
 # Variavies 
@@ -28,6 +21,6 @@ st.set_page_config(
 # Função princial
 def main():
       print("Teste")
-      
+
 if __name__ == "__main__":
     main()
