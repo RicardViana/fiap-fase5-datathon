@@ -1,5 +1,5 @@
 [project]
-name = "passos-magicos-datathon"
+name = "passos_magicos_datathon"
 version = "0.1.0"
 description = "Projeto de Data Analytics para o Datathon Fase 5 - Passos Mágicos"
 readme = "README.md"
@@ -19,3 +19,6 @@ dependencies = [
 [build-system]
 requires = ["hatchling"]
 build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+packages = ["."]
