@@ -10,12 +10,13 @@ dependencies = [
     "numpy",
     "scikit-learn",
     "tensorflow",
+    "keras",
     "joblib",
     "matplotlib",
     "seaborn",
     "openpyxl",
-    "xgboost",     
-    "tqdm",
+    "xgboost",
+    "tqdm"
 ]
 
 [build-system]
