@@ -1,149 +1,336 @@
-import streamlit as st
-import pandas as pd
-import numpy as np
-# import tensorflow as tf  <-- Descomente quando tiver o modelo
-# import joblib            <-- Descomente quando tiver o modelo
-import random # Apenas para simulação visual
+# Importar bibliotecas padrão
+import io
+import re
+import unicodedata
+import os
 
-# --- Configuração da Página ---
+# Importar bibliotecas de terceiros
+import joblib
+import matplotlib.pyplot as plt
+import numpy as np
+import pandas as pd
+import shap
+import streamlit as st
+
+# Variável de debug
+validar_shap = 'n'
+
+# ==========================================
+# CONFIGURAÇÃO DA PÁGINA
+# ==========================================
 st.set_page_config(
-    page_title="Predição de Risco - Passos Mágicos",
+    page_title="Predição de Risco de Defasagem",
     page_icon="🎓",
     layout="centered"
 )
 
-# --- CSS para melhorar a aparência (Opcional) ---
-st.markdown("""
-    <style>
-    .stButton>button {
-        width: 100%;
-        margin-top: 20px;
+# ==========================================
+# FUNÇÕES DE PREPARO DE DADOS (Do seu Notebook)
+# ==========================================
+def coerce_numeric(s):
+    return pd.to_numeric(s, errors="coerce")
+
+def extrair_fase(valor):
+    if pd.isna(valor):
+        return np.nan
+    valor = str(valor).lower()
+    if "alfa" in valor:
+        return 0
+    m = re.search(r"fase\s*(\d+)", valor)
+    if m:
+        return int(m.group(1))
+    return np.nan
+
+def padronizar_genero(df):
+    df = df.copy()
+    if "genero" in df.columns:
+        df["genero"] = df["genero"].astype(str).str.strip().str.lower()
+        map_genero = {
+            "menino": "masculino", "masculino": "masculino",
+            "menina": "feminino", "feminino": "feminino"
+        }
+        df["genero"] = df["genero"].map(map_genero)
+    return df
+
+def padronizar_idade(df):
+    df = df.copy()
+    if "idade" not in df.columns:
+        return df
+    s = df["idade"]
+    dt = pd.to_datetime(s, errors="coerce")
+    idade_from_date = np.where(dt.notna() & (dt.dt.year == 1900) & (dt.dt.month == 1), dt.dt.day, np.nan)
+    idade_num = pd.to_numeric(s, errors="coerce")
+    idade_final = pd.Series(idade_num, index=df.index)
+    mask = idade_final.isna() & ~pd.isna(idade_from_date)
+    idade_final.loc[mask] = idade_from_date[mask]
+    idade_final = idade_final.where(idade_final.between(6, 30))
+    df["idade"] = idade_final.round()
+    return df
+
+def tratar_inde_2024(df):
+    df = df.copy()
+    if "inde_2024" in df.columns:
+        tmp = df["inde_2024"].astype(str).str.strip().str.upper()
+        tmp = tmp.replace("INCLUIR", np.nan)
+        df["inde_2024"] = coerce_numeric(tmp)
+    return df
+
+def preparar_base_app(df):
+    """
+    Função adaptada do notebook para preparar os dados de entrada do usuário.
+    Equivale a modo_treino=False no seu notebook.
+    """
+    df = df.copy()
+    df = padronizar_genero(df)
+    df = padronizar_idade(df)
+    df = tratar_inde_2024(df)
+
+    if "fase_ideal" in df.columns:
+        df["fase_ideal"] = df["fase_ideal"].apply(extrair_fase)
+
+    # Features extras (Feature Engineering)
+    cols_acad = [c for c in ["mat","por","ing"] if c in df.columns]
+    if len(cols_acad) >= 2:
+        df["media_academica"] = df[cols_acad].mean(axis=1)
+
+    cols_comp = [c for c in ["iaa","ieg","ips","ipp"] if c in df.columns]
+    if len(cols_comp) >= 2:
+        df["media_comportamental"] = df[cols_comp].mean(axis=1)
+
+    if ("inde_2022" in df.columns) and ("inde_2023" in df.columns):
+        df["delta_inde"] = df["inde_2023"] - df["inde_2022"]
+
+    return df
+
+# ==========================================
+# DEFINIÇÃO DE FUNÇÕES DO APP
+# ==========================================
+def traduzir_nomes_features(lista_nomes_tecnicos):
+    """Traduz os nomes técnicos do Pipeline para Português legível."""
+    mapa_nomes = {
+        'num__idade': 'Idade do Aluno',
+        'num__inde_2024': 'Índice INDE (2024)',
+        'num__media_academica': 'Média Acadêmica (Mat, Por, Ing)',
+        'num__media_comportamental': 'Média Comportamental (IAA, IEG, IPS, IPP)',
+        'num__delta_inde': 'Evolução do INDE (23-22)',
+        'num__fase_ideal': 'Fase Ideal',
+        'cat__genero_masculino': 'Gênero (Masculino)',
+        'cat__genero_feminino': 'Gênero (Feminino)'
     }
-    </style>
-    """, unsafe_allow_html=True)
+    
+    nomes_traduzidos = []
+    for nome in lista_nomes_tecnicos:
+        if nome in mapa_nomes:
+            nomes_traduzidos.append(mapa_nomes[nome])
+        else:
+            limpo = nome.replace('num__', '').replace('cat__', '').replace('bin__', '').replace('_', ' ').title()
+            nomes_traduzidos.append(limpo)
+            
+    return nomes_traduzidos
 
-# --- Cabeçalho ---
-st.title("🎓 Passos Mágicos: Sistema de Alerta")
-st.markdown("### Ferramenta de Predição de Risco de Defasagem")
-st.info("ℹ️ Preencha os indicadores pedagógicos e psicossociais para avaliar o risco do aluno.")
-st.divider()
-
-# ==============================================================================
-# ⚠️ ÁREA DE CARREGAMENTO DO MODELO (ATUALMENTE EM MODO SIMULAÇÃO)
-# ==============================================================================
-
-# QUANDO TIVER O MODELO PRONTO, DESCOMENTE O BLOCO ABAIXO E APAGUE O BLOCO DE SIMULAÇÃO:
-
-"""
-@st.cache_resource
-def load_assets():
+@st.cache_resource 
+def load_models_and_config():
+    """Carrega o modelo treinado e o arquivo de configuração usando caminhos relativos."""
+    
+    # 1. Definimos os caminhos relativos apontando para a pasta 'models'
+    caminho_modelo = os.path.join("models", "modelo_passos_magicos.pkl")
+    caminho_config = os.path.join("models", "config_passos_magicos.pkl")
+    
     try:
-        model = tf.keras.models.load_model('modelo_passos_magicos.keras')
-        scaler = joblib.load('scaler_passos_magicos.pkl')
-        return model, scaler
-    except Exception as e:
-        st.error(f"Erro ao carregar arquivos: {e}")
+        # 2. Carregamos os arquivos usando os novos caminhos
+        modelo = joblib.load(caminho_modelo)
+        config = joblib.load(caminho_config)
+        return modelo, config
+        
+    except FileNotFoundError:
+        # 3. Mensagem de erro atualizada para refletir a nova estrutura
+        st.error(f"Arquivos não encontrados. Certifique-se de que a pasta 'models' existe junto ao app.py e contém os arquivos .pkl.")
         return None, None
 
-model, scaler = load_assets()
-"""
+@st.cache_resource
+def _get_shap_explainer(_classifier):
+    return shap.TreeExplainer(_classifier)
 
-# --- BLOCO DE SIMULAÇÃO (APAGUE ISSO DEPOIS) ---
-model = None 
-scaler = None
-# ==============================================================================
+def configurar_sidebar():
+    with st.sidebar:
+        st.header("📌 Sobre o Projeto")
+        st.info(
+            """
+            Aplicativo desenvolvido para o **Datathon FIAP - Fase 5**.
+            Prevê o risco de defasagem de alunos da ONG Passos Mágicos.
+            """
+        )
+        st.markdown("---")
+        st.subheader("👨‍💻 Equipe")
+        st.markdown("• Insira o nome da sua equipe aqui")
 
+def gerar_explicacao_shap(model, input_df_processed):
+    """Gera o gráfico SHAP Waterfall."""
+    try:
+        preprocessor = model.named_steps['prep']
+        classifier = model.named_steps['model']
 
-# --- Formulário de Entrada ---
-with st.form("form_predicao"):
-    st.subheader("📊 Indicadores do Aluno")
-    
-    col1, col2 = st.columns(2)
-    
-    with col1:
-        st.markdown("### 🧠 Psicossocial")
-        iaa = st.number_input("IAA (Auto Avaliação)", 0.0, 10.0, 7.5, 0.1)
-        ieg = st.number_input("IEG (Engajamento)", 0.0, 10.0, 8.0, 0.1)
-        ips = st.number_input("IPS (Psicossocial)", 0.0, 10.0, 7.0, 0.1)
-        ipp = st.number_input("IPP (Psicopedagógico)", 0.0, 10.0, 7.0, 0.1)
+        input_transformed = preprocessor.transform(input_df_processed)
+        feature_names_raw = preprocessor.get_feature_names_out()
+        feature_names_pt = traduzir_nomes_features(feature_names_raw)
 
-    with col2:
-        st.markdown("### 📚 Acadêmico")
-        ida = st.number_input("IDA (Aprendizagem)", 0.0, 10.0, 6.5, 0.1)
-        ipv = st.number_input("IPV (Ponto de Virada)", 0.0, 10.0, 7.0, 0.1)
-        mat = st.number_input("Nota Matemática", 0.0, 10.0, 6.0, 0.1)
-        por = st.number_input("Nota Português", 0.0, 10.0, 6.0, 0.1)
+        df_mapeamento = pd.DataFrame({
+            'Nome Técnico': feature_names_raw,
+            'Nome Traduzido': feature_names_pt,  
+            'Valor Inputado': input_transformed[0]
+        })
 
-    # Botão de submissão
-    submit_button = st.form_submit_button("🔍 Calcular Probabilidade de Risco", type="primary")
+        explainer = _get_shap_explainer(classifier)
+        shap_values = explainer(input_transformed)
 
-
-# --- Lógica de Exibição do Resultado ---
-if submit_button:
-    
-    # 1. Criação do DataFrame com os dados inseridos
-    input_data = pd.DataFrame({
-        'iaa': [iaa], 'ieg': [ieg], 'ips': [ips], 'ipp': [ipp],
-        'ida': [ida], 'mat': [mat], 'por': [por], 'ipv': [ipv]
-    })
-
-    # ==========================================================================
-    # LÓGICA REAL (DESCOMENTAR DEPOIS)
-    # ==========================================================================
-    if model is not None and scaler is not None:
-        try:
-            # input_scaled = scaler.transform(input_data)
-            # prediction_prob = model.predict(input_scaled)
-            # probability = prediction_prob[0][0]
-            pass # Remover esse pass quando descomentar acima
-        except Exception as e:
-            st.error(f"Erro na predição: {e}")
-            probability = 0.0
-    
-    # ==========================================================================
-    # LÓGICA DE SIMULAÇÃO (APAGAR DEPOIS)
-    # ==========================================================================
-    else:
-        # Gera um valor aleatório só para testar o visual
-        # Se as notas forem baixas, finge risco alto, senão risco baixo
-        media_notas = (iaa + ieg + ida + mat) / 4
-        if media_notas < 6.0:
-            probability = random.uniform(0.60, 0.95) # Simula Alto Risco
+        # Trata array do shap caso seja multiclasse (depende da versão do sklearn/shap)
+        if len(shap_values.shape) == 3:
+            shap_values_to_plot = shap_values[0, :, 1] 
         else:
-            probability = random.uniform(0.10, 0.40) # Simula Baixo Risco
-            
-        st.warning("⚠️ MODO DE SIMULAÇÃO: O modelo ainda não foi carregado. Este resultado é ilustrativo.")
-    # ==========================================================================
+            shap_values_to_plot = shap_values[0]
 
+        shap_values_to_plot.feature_names = feature_names_pt
 
-    # --- EXIBIÇÃO DO DASHBOARD DE RESULTADO ---
-    st.divider()
-    st.subheader("📋 Resultado da Análise")
-
-    col_metric, col_desc = st.columns([1, 2])
-
-    with col_metric:
-        st.metric(label="Probabilidade de Risco", value=f"{probability:.1%}")
+        fig, ax = plt.subplots(figsize=(10, 6))
+        shap.plots.waterfall(shap_values_to_plot, show=False, max_display=10)
         
-        # Barra de progresso visual
-        st.progress(int(probability * 100))
+        return plt.gcf(), df_mapeamento
+    except Exception as e:
+        st.error(f"Erro ao gerar explicabilidade SHAP: {e}")
+        return None, None
 
-    with col_desc:
-        if probability > 0.5:
-            st.error("🚨 **ALTO RISCO IDENTIFICADO**")
-            st.markdown(f"""
-            O modelo indica uma probabilidade de **{probability:.1%}** deste aluno entrar em defasagem.
-            
-            **Recomendações Sugeridas:**
-            - 🛑 Contato imediato com a família.
-            - 🛑 Agendamento com psicopedagogia.
-            - 🛑 Reforço escolar nas matérias críticas (Mat/Port).
-            """)
+def get_user_input_features():
+    """Coleta os dados do usuário"""
+    st.header("1. Dados do Aluno")
+    
+    col1, col2, col3 = st.columns(3)
+    with col1:
+        idade = st.number_input("Idade", min_value=6, max_value=30, value=12)
+    with col2:
+        genero = st.selectbox("Gênero", ["Menino", "Menina"])
+    with col3:
+        fase = st.selectbox("Fase Ideal", ["Alfa", "Fase 1", "Fase 2", "Fase 3", "Fase 4", "Fase 5", "Fase 6", "Fase 7", "Fase 8"])
+
+    st.markdown("---")
+    st.header("2. Notas Acadêmicas")
+    col_n1, col_n2, col_n3 = st.columns(3)
+    with col_n1:
+        mat = st.number_input("Matemática (MAT)", min_value=0.0, max_value=10.0, value=7.0, step=0.1)
+    with col_n2:
+        por = st.number_input("Português (POR)", min_value=0.0, max_value=10.0, value=7.0, step=0.1)
+    with col_n3:
+        ing = st.number_input("Inglês (ING)", min_value=0.0, max_value=10.0, value=7.0, step=0.1)
+
+    st.markdown("---")
+    st.header("3. Indicadores (Comportamental e Geral)")
+    col_i1, col_i2 = st.columns(2)
+    with col_i1:
+        iaa = st.number_input("Ind. Autoavaliação (IAA)", min_value=0.0, max_value=10.0, value=7.5)
+        ieg = st.number_input("Ind. Engajamento (IEG)", min_value=0.0, max_value=10.0, value=7.5)
+        inde_2024 = st.number_input("INDE Atual (2024)", min_value=0.0, max_value=10.0, value=7.0)
+    with col_i2:
+        ips = st.number_input("Ind. Psicossocial (IPS)", min_value=0.0, max_value=10.0, value=7.5)
+        ipp = st.number_input("Ind. Psicopedagógico (IPP)", min_value=0.0, max_value=10.0, value=7.5)
+        
+    with st.expander("Histórico de INDE (Opcional - para calcular evolução)"):
+        col_h1, col_h2 = st.columns(2)
+        with col_h1:
+            inde_2022 = st.number_input("INDE 2022", min_value=0.0, max_value=10.0, value=7.0)
+        with col_h2:
+            inde_2023 = st.number_input("INDE 2023", min_value=0.0, max_value=10.0, value=7.0)
+
+    # Cria dicionário com a estrutura igual ao DataFrame de treino
+    data = {
+        'idade': idade,
+        'genero': genero,
+        'fase_ideal': fase,
+        'mat': mat,
+        'por': por,
+        'ing': ing,
+        'iaa': iaa,
+        'ieg': ieg,
+        'ips': ips,
+        'ipp': ipp,
+        'inde_2022': inde_2022,
+        'inde_2023': inde_2023,
+        'inde_2024': str(inde_2024) # A função de preparo espera string às vezes
+    }
+    
+    return pd.DataFrame(data, index=[0])
+
+# ==========================================
+# FUNÇÃO PRINCIPAL
+# ==========================================
+def main():
+    configurar_sidebar()
+    
+    # Carrega Modelo e Configs (incluindo o Threshold otimizado)
+    model, config = load_models_and_config()
+
+    st.title("🎓 Previsão de Defasagem Educacional")
+    st.markdown("Analise o risco do aluno apresentar defasagem educacional (IAN <= 5) com base em seus indicadores.")
+    
+    if config:
+        st.caption(f"🤖 Modelo Ativo: **{config['best_model']}** | 🎚️ Threshold de Corte: **{config['threshold']:.2f}**")
+    
+    st.markdown("---")
+
+    # Coleta input bruto
+    raw_input_df = get_user_input_features()
+
+    st.markdown("###")
+    
+    if st.button("🔍 Realizar Predição", type="primary", use_container_width=True):
+        if model is not None and config is not None:
+            with st.spinner('Analisando dados...'):
+                try:
+                    # 1. Aplica o pré-processamento igualzinho ao Notebook
+                    processed_df = preparar_base_app(raw_input_df)
+
+                    # 2. Pega as probabilidades
+                    probability = model.predict_proba(processed_df)
+                    proba_risco = probability[0][1] # Probabilidade de ser classe 1 (Risco)
+                    
+                    # 3. Usa o Threshold do config para decidir
+                    limiar = config['threshold']
+                    
+                    st.markdown("---")
+                    st.header("Resultado da Análise")
+
+                    if proba_risco >= limiar:
+                        st.error("⚠️ **ALTO RISCO DE DEFASAGEM IDENTIFICADO**")
+                        st.metric(label="Probabilidade de Risco", value=f"{proba_risco * 100:.1f}%")
+                        st.warning("👉 **Recomendação:** Necessário acompanhamento pedagógico e psicossocial intensificado.")
+                    else:
+                        st.success("✅ **ALUNO NO CAMINHO CERTO (BAIXO RISCO)**")
+                        st.metric(label="Probabilidade de Risco", value=f"{proba_risco * 100:.1f}%")
+                        st.info("👉 **Recomendação:** Manter acompanhamento padrão para garantir o engajamento.")
+                    
+                    # 4. Exibição do SHAP
+                    st.markdown("---")
+                    st.header("Fatores de Influência (Explicabilidade)")
+                    st.write("Entenda quais características mais impactaram esta previsão específica.")
+                    
+                    fig_shap, df_map = gerar_explicacao_shap(model, processed_df)
+                    if fig_shap:
+                        st.pyplot(fig_shap)
+                        
+                        st.markdown("""
+                        **Legenda:** - **Eixo X:** Pontuação base / Probabilidade.  
+                        - **Barras Vermelhas:** Fatores que **aumentam** o risco de defasagem.  
+                        - **Barras Azuis:** Fatores que **diminuem** o risco de defasagem.  
+                        """)
+
+                    if validar_shap.lower() == 's' and df_map is not None:
+                        st.markdown("---")
+                        st.header("🕵️‍♀️ Debug: Variáveis")
+                        with st.expander("Ver Mapeamento"):
+                            st.dataframe(df_map)
+
+                except Exception as e:
+                    st.error(f"Ocorreu um erro técnico ao realizar a predição: {e}")
         else:
-            st.success("✅ **SITUAÇÃO SOB CONTROLE**")
-            st.markdown(f"""
-            O aluno apresenta indicadores saudáveis, com apenas **{probability:.1%}** de risco calculado.
-            
-            **Ação:**
-            - Manter acompanhamento regular nas atividades do Passos Mágicos.
-            """)
+            st.error("⚠️ O modelo não foi carregado corretamente.")
+
+if __name__ == "__main__":
+    main()
