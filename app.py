@@ -3,6 +3,7 @@ import io
 import re
 import unicodedata
 import os
+import datetime
 
 # Importar bibliotecas de terceiros
 import joblib
@@ -239,6 +240,9 @@ def get_user_input_features():
         with col_h2:
             inde_2023 = st.number_input("INDE 2023", min_value=0.0, max_value=10.0, value=7.0)
 
+    # Captura o ano atual automaticamente do sistema
+    ano_atual = datetime.date.today().year
+
     # Cria dicionário com a estrutura igual ao DataFrame de treino
     data = {
         'idade': idade,
@@ -253,7 +257,14 @@ def get_user_input_features():
         'ipp': ipp,
         'inde_2022': inde_2022,
         'inde_2023': inde_2023,
-        'inde_2024': str(inde_2024) # A função de preparo espera string às vezes
+        'inde_2024': str(inde_2024),
+        
+        # --- COLUNAS FALTANTES (Serão tratadas pelo Imputer do seu Pipeline) ---
+        'ano_pede': ano_atual,    # <--- Agora o ano se atualiza sozinho!
+        'ipv': np.nan,            # Indicador de Ponto de Virada (vazio)
+        'ida': np.nan,            # Indicador de Desempenho Acadêmico (vazio)
+        'ano_ingresso': np.nan,   # Ano de ingresso (vazio)
+        'n_av': np.nan            # Número de avaliações (vazio)
     }
     
     return pd.DataFrame(data, index=[0])
