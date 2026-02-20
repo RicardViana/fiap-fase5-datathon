@@ -16,5 +16,6 @@ dependencies = [
     "seaborn",
     "openpyxl",
     "xgboost",
-    "tqdm"
+    "tqdm",
+    "shap"
 ]
