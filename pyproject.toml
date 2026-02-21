@@ -17,5 +17,6 @@ dependencies = [
     "openpyxl",
     "xgboost",
     "tqdm",
-    "shap"
+    "shap",
+    "ipykernel"
 ]
