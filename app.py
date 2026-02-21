@@ -182,7 +182,7 @@ def configurar_sidebar():
         
         st.subheader("📂 Código Fonte")
         st.markdown("Acesse o repositório completo do projeto:")
-        st.link_button("🔗 Ver no GitHub", "https://github.com/RicardViana/fiap-data-viz-and-production-models-tc")
+        st.link_button("🔗 Ver no GitHub", "https://github.com/RicardViana/fiap-fase5-datathon")
 
 def gerar_explicacao_shap(model, input_df_processed):
     """Gera o gráfico SHAP Waterfall."""
