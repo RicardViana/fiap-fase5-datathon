@@ -18,5 +18,6 @@ dependencies = [
     "xgboost",
     "tqdm",
     "shap",
-    "ipykernel"
+    "ipykernel",
+    "python-dotenv"
 ]
