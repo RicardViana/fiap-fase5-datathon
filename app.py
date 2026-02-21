@@ -240,7 +240,7 @@ def get_user_input_features():
     with col_i1:
         iaa = st.number_input("Ind. Autoavaliação (IAA)", min_value=0.0, max_value=10.0, value=7.5)
         ieg = st.number_input("Ind. Engajamento (IEG)", min_value=0.0, max_value=10.0, value=7.5)
-        inde_2024 = st.number_input("INDE Atual (2024)", min_value=0.0, max_value=10.0, value=7.0)
+        inde_2024 = st.number_input("INDE 2024", min_value=0.0, max_value=10.0, value=0.0)
     with col_i2:
         ips = st.number_input("Ind. Psicossocial (IPS)", min_value=0.0, max_value=10.0, value=7.5)
         ipp = st.number_input("Ind. Psicopedagógico (IPP)", min_value=0.0, max_value=10.0, value=7.5)
