@@ -2,6 +2,7 @@
 #/data
 *.mp4
 *.bat
+app_modelo.py
 
 # Mac OS-specific storage files
 .DS_Store
