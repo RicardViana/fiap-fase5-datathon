@@ -275,7 +275,8 @@ def get_user_input_features():
         'ipv': np.nan,            # Indicador de Ponto de Virada (vazio)
         'ida': np.nan,            # Indicador de Desempenho Acadêmico (vazio)
         'ano_ingresso': np.nan,   # Ano de ingresso (vazio)
-        'n_av': np.nan            # Número de avaliações (vazio)
+        'n_av': np.nan,            # Número de avaliações (vazio)
+        'Unnamed: 0': 0
     }
     
     return pd.DataFrame(data, index=[0])
