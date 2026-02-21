@@ -157,8 +157,7 @@ def configurar_sidebar():
         st.header("📌 Sobre o Projeto")
         st.info(
             """
-            Aplicativo desenvolvido para o **Datathon FIAP - Fase 5**.
-            Prevê o risco de defasagem de alunos da ONG Passos Mágicos.
+            Aplicativo desenvolvido para o **Datathon FIAP - Fase 5** para prevê o risco de defasagem de alunos da ONG Passos Mágicos.
             """
         )
         st.markdown("---")
