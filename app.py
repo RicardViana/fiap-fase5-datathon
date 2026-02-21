@@ -162,8 +162,27 @@ def configurar_sidebar():
             """
         )
         st.markdown("---")
-        st.subheader("👨‍💻 Equipe")
-        st.markdown("• Insira o nome da sua equipe aqui")
+
+        st.subheader("👨‍💻 Equipe de Desenvolvimento")
+        
+        membros = [
+            {"nome": "Elton José Araujo Silva", "link": "https://www.linkedin.com/in/elton-araujo-silva/"},
+            {"nome": "Leonardo Fajoli Formigon", "link": "https://www.linkedin.com/in/leonardo-formigon-63052320b/"}, 
+            {"nome": "Lucas Augusto Fernandes de Lira", "link": "https://www.linkedin.com/in/lucas--lira-/"},
+            {"nome": "Mariana Domingues Brandão", "link": "https://www.linkedin.com/in/maridbrandao"},
+            {"nome": "Ricardo Vieira Viana", "link": "https://www.linkedin.com/in/ricardvviana"}
+
+        ]
+
+
+        for membro in membros:
+            st.markdown(f"• [{membro['nome']}]({membro['link']})")
+            
+        st.markdown("---")
+        
+        st.subheader("📂 Código Fonte")
+        st.markdown("Acesse o repositório completo do projeto:")
+        st.link_button("🔗 Ver no GitHub", "https://github.com/RicardViana/fiap-data-viz-and-production-models-tc")
 
 def gerar_explicacao_shap(model, input_df_processed):
     """Gera o gráfico SHAP Waterfall."""
