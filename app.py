@@ -271,7 +271,7 @@ def get_user_input_features():
         'inde_2024': str(inde_2024),
         
         # Colunas faltantes e serão tratadas pelo Imputer do seu Pipeline
-        'ano_pede': ano_atual,    #
+        'ano_pede': ano_atual,    
         'ipv': np.nan,            # Indicador de Ponto de Virada (vazio)
         'ida': np.nan,            # Indicador de Desempenho Acadêmico (vazio)
         'ano_ingresso': np.nan,   # Ano de ingresso (vazio)
@@ -350,7 +350,7 @@ def main():
 
                 except Exception as e:
                     st.error(f"Ocorreu um erro técnico ao realizar a predição: {e}")
-                    
+
         else:
             st.error("⚠️ O modelo não foi carregado corretamente.")
 
