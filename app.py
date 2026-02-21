@@ -16,18 +16,15 @@ import streamlit as st
 # Variável de debug
 validar_shap = 'n'
 
-# ==========================================
+
 # CONFIGURAÇÃO DA PÁGINA
-# ==========================================
 st.set_page_config(
     page_title="Predição de Risco de Defasagem",
     page_icon="🎓",
     layout="centered"
 )
 
-# ==========================================
-# FUNÇÕES DE PREPARO DE DADOS (Do seu Notebook)
-# ==========================================
+# FUNÇÕES DE PREPARO DE DADOS
 def coerce_numeric(s):
     return pd.to_numeric(s, errors="coerce")
 
@@ -77,10 +74,6 @@ def tratar_inde_2024(df):
     return df
 
 def preparar_base_app(df):
-    """
-    Função adaptada do notebook para preparar os dados de entrada do usuário.
-    Equivale a modo_treino=False no seu notebook.
-    """
     df = df.copy()
     df = padronizar_genero(df)
     df = padronizar_idade(df)
@@ -103,11 +96,11 @@ def preparar_base_app(df):
 
     return df
 
-# ==========================================
 # DEFINIÇÃO DE FUNÇÕES DO APP
-# ==========================================
 def traduzir_nomes_features(lista_nomes_tecnicos):
+
     """Traduz os nomes técnicos do Pipeline para Português legível."""
+
     mapa_nomes = {
         'num__idade': 'Idade do Aluno',
         'num__inde_2024': 'Índice INDE (2024)',
@@ -120,6 +113,7 @@ def traduzir_nomes_features(lista_nomes_tecnicos):
     }
     
     nomes_traduzidos = []
+
     for nome in lista_nomes_tecnicos:
         if nome in mapa_nomes:
             nomes_traduzidos.append(mapa_nomes[nome])
@@ -131,20 +125,18 @@ def traduzir_nomes_features(lista_nomes_tecnicos):
 
 @st.cache_resource 
 def load_models_and_config():
+
     """Carrega o modelo treinado e o arquivo de configuração usando caminhos relativos."""
     
-    # 1. Definimos os caminhos relativos apontando para a pasta 'models'
     caminho_modelo = os.path.join("models", "modelo_passos_magicos.pkl")
     caminho_config = os.path.join("models", "config_passos_magicos.pkl")
     
     try:
-        # 2. Carregamos os arquivos usando os novos caminhos
         modelo = joblib.load(caminho_modelo)
         config = joblib.load(caminho_config)
         return modelo, config
         
     except FileNotFoundError:
-        # 3. Mensagem de erro atualizada para refletir a nova estrutura
         st.error(f"Arquivos não encontrados. Certifique-se de que a pasta 'models' existe junto ao app.py e contém os arquivos .pkl.")
         return None, None
 
@@ -173,7 +165,6 @@ def configurar_sidebar():
 
         ]
 
-
         for membro in membros:
             st.markdown(f"• [{membro['nome']}]({membro['link']})")
             
@@ -184,7 +175,9 @@ def configurar_sidebar():
         st.link_button("🔗 Ver no GitHub", "https://github.com/RicardViana/fiap-fase5-datathon")
 
 def gerar_explicacao_shap(model, input_df_processed):
+
     """Gera o gráfico SHAP Waterfall."""
+
     try:
         preprocessor = model.named_steps['prep']
         classifier = model.named_steps['model']
@@ -202,7 +195,6 @@ def gerar_explicacao_shap(model, input_df_processed):
         explainer = _get_shap_explainer(classifier)
         shap_values = explainer(input_transformed)
 
-        # Trata array do shap caso seja multiclasse (depende da versão do sklearn/shap)
         if len(shap_values.shape) == 3:
             shap_values_to_plot = shap_values[0, :, 1] 
         else:
@@ -214,14 +206,16 @@ def gerar_explicacao_shap(model, input_df_processed):
         shap.plots.waterfall(shap_values_to_plot, show=False, max_display=10)
         
         return plt.gcf(), df_mapeamento
+    
     except Exception as e:
         st.error(f"Erro ao gerar explicabilidade SHAP: {e}")
         return None, None
 
 def get_user_input_features():
+
     """Coleta os dados do usuário"""
+
     st.header("1. Dados do Aluno")
-    
     col1, col2, col3 = st.columns(3)
     with col1:
         idade = st.number_input("Idade", min_value=6, max_value=30, value=12)
@@ -258,10 +252,9 @@ def get_user_input_features():
         with col_h2:
             inde_2023 = st.number_input("INDE 2023", min_value=0.0, max_value=10.0, value=7.0)
 
-    # Captura o ano atual automaticamente do sistema
     ano_atual = datetime.date.today().year
 
-    # Cria dicionário com a estrutura igual ao DataFrame de treino
+    # Dicionário com a estrutura igual ao DataFrame de treino
     data = {
         'idade': idade,
         'genero': genero,
@@ -277,8 +270,8 @@ def get_user_input_features():
         'inde_2023': inde_2023,
         'inde_2024': str(inde_2024),
         
-        # --- COLUNAS FALTANTES (Serão tratadas pelo Imputer do seu Pipeline) ---
-        'ano_pede': ano_atual,    # <--- Agora o ano se atualiza sozinho!
+        # Colunas faltantes e serão tratadas pelo Imputer do seu Pipeline
+        'ano_pede': ano_atual,    #
         'ipv': np.nan,            # Indicador de Ponto de Virada (vazio)
         'ida': np.nan,            # Indicador de Desempenho Acadêmico (vazio)
         'ano_ingresso': np.nan,   # Ano de ingresso (vazio)
@@ -287,13 +280,11 @@ def get_user_input_features():
     
     return pd.DataFrame(data, index=[0])
 
-# ==========================================
 # FUNÇÃO PRINCIPAL
-# ==========================================
 def main():
     configurar_sidebar()
     
-    # Carrega Modelo e Configs (incluindo o Threshold otimizado)
+    # Carregar Modelo e Configs
     model, config = load_models_and_config()
 
     st.title("🎓 Previsão de Defasagem Educacional")
@@ -304,7 +295,7 @@ def main():
     
     st.markdown("---")
 
-    # Coleta input bruto
+    # Input bruto
     raw_input_df = get_user_input_features()
 
     st.markdown("###")
@@ -313,14 +304,14 @@ def main():
         if model is not None and config is not None:
             with st.spinner('Analisando dados...'):
                 try:
-                    # 1. Aplica o pré-processamento igualzinho ao Notebook
+                    # Aplicar o pré-processamento igualzinho ao Notebook
                     processed_df = preparar_base_app(raw_input_df)
 
-                    # 2. Pega as probabilidades
+                    # Pegar probabilidades
                     probability = model.predict_proba(processed_df)
                     proba_risco = probability[0][1] # Probabilidade de ser classe 1 (Risco)
                     
-                    # 3. Usa o Threshold do config para decidir
+                    # Usar o Threshold do config para decidir
                     limiar = config['threshold']
                     
                     st.markdown("---")
@@ -330,6 +321,7 @@ def main():
                         st.error("⚠️ **ALTO RISCO DE DEFASAGEM IDENTIFICADO**")
                         st.metric(label="Probabilidade de Risco", value=f"{proba_risco * 100:.1f}%")
                         st.warning("👉 **Recomendação:** Necessário acompanhamento pedagógico e psicossocial intensificado.")
+
                     else:
                         st.success("✅ **ALUNO NO CAMINHO CERTO (BAIXO RISCO)**")
                         st.metric(label="Probabilidade de Risco", value=f"{proba_risco * 100:.1f}%")
@@ -358,6 +350,7 @@ def main():
 
                 except Exception as e:
                     st.error(f"Ocorreu um erro técnico ao realizar a predição: {e}")
+                    
         else:
             st.error("⚠️ O modelo não foi carregado corretamente.")
 
