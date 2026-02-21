@@ -177,10 +177,15 @@ def configurar_sidebar():
 def gerar_explicacao_shap(model, input_df_processed):
 
     """Gera o gráfico SHAP Waterfall."""
-
+    
     try:
         preprocessor = model.named_steps['prep']
         classifier = model.named_steps['model']
+
+        nome_modelo = type(classifier).__name__
+        if nome_modelo == 'LogisticRegression':
+            st.info("ℹ️ O gráfico detalhado de explicabilidade (SHAP) é exclusivo para modelos baseados em Árvores de Decisão. O modelo atual em uso é uma Regressão Logística.")
+            return None, None
 
         input_transformed = preprocessor.transform(input_df_processed)
         feature_names_raw = preprocessor.get_feature_names_out()
@@ -252,7 +257,14 @@ def get_user_input_features():
         with col_h2:
             inde_2023 = st.number_input("INDE 2023", min_value=0.0, max_value=10.0, value=7.0)
 
-    ano_atual = datetime.date.today().year
+    st.markdown("---")
+    st.header("4. Configuração do Modelo")
+    
+    ano_pede_escolhido = st.selectbox(
+        "Ano Base de Comparação (Baseline)", 
+        options=[2024, 2023, 2022],
+        help="O modelo foi treinado com dados históricos. Escolha com qual ano de referência deseja comparar o desempenho deste aluno."
+    )
 
     # Dicionário com a estrutura igual ao DataFrame de treino
     data = {
@@ -271,7 +283,7 @@ def get_user_input_features():
         'inde_2024': str(inde_2024),
         
         # Colunas faltantes e serão tratadas pelo Imputer do seu Pipeline
-        'ano_pede': ano_atual,    
+        'ano_pede': ano_pede_escolhido,    
         'ipv': np.nan,            # Indicador de Ponto de Virada (vazio)
         'ida': np.nan,            # Indicador de Desempenho Acadêmico (vazio)
         'ano_ingresso': np.nan,   # Ano de ingresso (vazio)
