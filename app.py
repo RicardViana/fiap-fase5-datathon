@@ -108,7 +108,11 @@ def traduzir_nomes_features(lista_nomes_tecnicos):
         'num__delta_inde': 'Evolução do INDE (Últimos 2 anos)',
         'num__fase_ideal': 'Fase Ideal',
         'cat__genero_masculino': 'Gênero (Masculino)',
-        'cat__genero_feminino': 'Gênero (Feminino)'
+        'cat__genero_feminino': 'Gênero (Feminino)',
+        # Adicionadas as traduções para os indicadores avançados:
+        'num__ida': 'Indicador de Desemp. Acad. (IDA)',
+        'num__ipv': 'Indicador de Ponto de Virada (IPV)',
+        'num__n_av': 'Número de Avaliações'
     }
     
     nomes_traduzidos = []
@@ -244,12 +248,6 @@ def get_user_input_features():
     with col_n3:
         ing = st.number_input("Inglês (ING)", min_value=0.0, max_value=10.0, value=None, step=0.1, format="%0.4f")
 
-    # CÁLCULO AUTOMÁTICO DO IDA (Conforme regra de negócio da ONG)
-    if mat is not None and por is not None and ing is not None:
-        ida_calculado = (mat + por + ing) / 3
-    else:
-        ida_calculado = np.nan
-
     st.markdown("---")
     st.header("3. Indicadores (Comportamental e Geral)")
     col_i1, col_i2 = st.columns(2)
@@ -272,11 +270,13 @@ def get_user_input_features():
     st.markdown("---")
     st.header("4. Indicadores Avançados")
     with st.expander("Preencha se possuir os dados (Importante para a precisão)"):
-        col_adv1, col_adv2 = st.columns(2)
+        col_adv1, col_adv2, col_adv3 = st.columns(3)
         with col_adv1:
-            ipv = st.number_input("Indicador de Ponto de Virada (IPV)", min_value=0.0, max_value=10.0, value=None, format="%0.4f")
+            ida = st.number_input("Ind. Desemp. Acad. (IDA)", min_value=0.0, max_value=10.0, value=None, format="%0.4f")
         with col_adv2:
-            n_av = st.number_input("Número de Avaliações", min_value=0, max_value=50, value=None, step=1)
+            ipv = st.number_input("Ponto de Virada (IPV)", min_value=0.0, max_value=10.0, value=None, format="%0.4f")
+        with col_adv3:
+            n_av = st.number_input("Nº de Avaliações", min_value=0, max_value=50, value=None, step=1)
 
     # Dicionário Final
     data = {
@@ -294,11 +294,11 @@ def get_user_input_features():
         'inde_2023': inde_2023 if inde_2023 is not None else np.nan,
         'inde_2024': str(inde_2024) if inde_2024 is not None else np.nan,
         
-        # Variáveis cruciais agora recebem dados reais!
-        'ida': ida_calculado,
+        # Variáveis cruciais incluídas no app
+        'ida': ida if ida is not None else np.nan,
         'ipv': ipv if ipv is not None else np.nan,
-        'n_av': n_av if n_av is not None else np.nan
-        
+        'n_av': n_av if n_av is not None else np.nan,
+
     }
     
     return pd.DataFrame(data, index=[0])
@@ -314,7 +314,7 @@ def main():
     st.markdown("Analise o risco do aluno apresentar defasagem educacional (IAN <= 5) com base em seus indicadores.")
     
     if config:
-        st.caption(f"🤖 Modelo Ativo: **{config['best_model']}** | 🎚️ Limiete (Threshold) de Corte: **{config['threshold']:.2f}**")
+        st.caption(f"🤖 Modelo Ativo: **{config['best_model']}** | 🎚️ Limite (Threshold) de Corte: **{config['threshold']:.2f}**")
     
     st.markdown("---")
 
