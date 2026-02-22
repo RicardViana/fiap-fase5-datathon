@@ -269,7 +269,9 @@ def get_user_input_features():
 
     st.markdown("---")
     st.header("4. Indicadores Avançados")
+    st.write("O IDA será calculado automaticamente com base nas notas, a menos que você digite um valor específico abaixo.")
     with st.expander("Preencha se possuir os dados (Importante para a precisão)"):
+        # Voltamos para 3 colunas para incluir o IDA
         col_adv1, col_adv2, col_adv3 = st.columns(3)
         with col_adv1:
             ida = st.number_input("Ind. Desemp. Acad. (IDA)", min_value=0.0, max_value=10.0, value=None, format="%0.4f")
@@ -277,6 +279,16 @@ def get_user_input_features():
             ipv = st.number_input("Ponto de Virada (IPV)", min_value=0.0, max_value=10.0, value=None, format="%0.4f")
         with col_adv3:
             n_av = st.number_input("Nº de Avaliações", min_value=0, max_value=50, value=None, step=1)
+
+    # ==========================================================
+    # LÓGICA INTELIGENTE DO IDA (Digitado vs Calculado)
+    # ==========================================================
+    if ida is not None:
+        ida_final = ida # Usa o que o usuário digitou na tela
+    elif mat is not None and por is not None and ing is not None:
+        ida_final = (mat + por + ing) / 3 # Calcula automaticamente
+    else:
+        ida_final = np.nan # Deixa vazio para o modelo inferir se faltar dados
 
     # Dicionário Final
     data = {
@@ -294,11 +306,13 @@ def get_user_input_features():
         'inde_2023': inde_2023 if inde_2023 is not None else np.nan,
         'inde_2024': str(inde_2024) if inde_2024 is not None else np.nan,
         
-        # Variáveis cruciais incluídas no app
-        'ida': ida if ida is not None else np.nan,
+        # Variáveis cruciais com a lógica aplicada
+        'ida': ida_final, 
         'ipv': ipv if ipv is not None else np.nan,
         'n_av': n_av if n_av is not None else np.nan,
-
+        
+        # Correção do erro técnico
+        'ano_ingresso': np.nan 
     }
     
     return pd.DataFrame(data, index=[0])
