@@ -234,39 +234,51 @@ def get_user_input_features():
     st.header("2. Notas Acadêmicas")
     st.write("Deixe em branco caso o aluno não possua a nota.")
     col_n1, col_n2, col_n3 = st.columns(3)
+    
     with col_n1:
-        # Trocamos value=7.0 para value=None
-        mat = st.number_input("Matemática (MAT)", min_value=0.0, max_value=10.0, value=None, step=0.1)
+        mat = st.number_input("Matemática (MAT)", min_value=0.0, max_value=10.0, value=None, step=0.1, format="%0.4f")
 
     with col_n2:
-        por = st.number_input("Português (POR)", min_value=0.0, max_value=10.0, value=None, step=0.1)
+        por = st.number_input("Português (POR)", min_value=0.0, max_value=10.0, value=None, step=0.1, format="%0.4f")
 
     with col_n3:
-        ing = st.number_input("Inglês (ING)", min_value=0.0, max_value=10.0, value=None, step=0.1)
+        ing = st.number_input("Inglês (ING)", min_value=0.0, max_value=10.0, value=None, step=0.1, format="%0.4f")
+
+    # CÁLCULO AUTOMÁTICO DO IDA (Conforme regra de negócio da ONG)
+    if mat is not None and por is not None and ing is not None:
+        ida_calculado = (mat + por + ing) / 3
+    else:
+        ida_calculado = np.nan
 
     st.markdown("---")
     st.header("3. Indicadores (Comportamental e Geral)")
     col_i1, col_i2 = st.columns(2)
     with col_i1:
-        iaa = st.number_input("Ind. Autoavaliação (IAA)", min_value=0.0, max_value=10.0, value=None)
-        ieg = st.number_input("Ind. Engajamento (IEG)", min_value=0.0, max_value=10.0, value=None)
-        inde_2024 = st.number_input("INDE Atual", min_value=0.0, max_value=10.0, value=None)
+        iaa = st.number_input("Ind. Autoavaliação (IAA)", min_value=0.0, max_value=10.0, value=None, format="%0.4f")
+        ieg = st.number_input("Ind. Engajamento (IEG)", min_value=0.0, max_value=10.0, value=None, format="%0.4f")
+        inde_2024 = st.number_input("INDE Atual", min_value=0.0, max_value=10.0, value=None, format="%0.4f")
 
     with col_i2:
-        ips = st.number_input("Ind. Psicossocial (IPS)", min_value=0.0, max_value=10.0, value=None)
-        ipp = st.number_input("Ind. Psicopedagógico (IPP)", min_value=0.0, max_value=10.0, value=None)
+        ips = st.number_input("Ind. Psicossocial (IPS)", min_value=0.0, max_value=10.0, value=None, format="%0.4f")
+        ipp = st.number_input("Ind. Psicopedagógico (IPP)", min_value=0.0, max_value=10.0, value=None, format="%0.4f")
         
     with st.expander("Histórico de INDE (Opcional - para calcular evolução)"):
         col_h1, col_h2 = st.columns(2)
         with col_h1:
-            # value=None permite que o campo fique vazio
-            inde_2022 = st.number_input("INDE de 2 anos atrás", min_value=0.0, max_value=10.0, value=None)
-
+            inde_2022 = st.number_input("INDE de 2 anos atrás", min_value=0.0, max_value=10.0, value=None, format="%0.4f")
         with col_h2:
-            inde_2023 = st.number_input("INDE do ano passado", min_value=0.0, max_value=10.0, value=None)
+            inde_2023 = st.number_input("INDE do ano passado", min_value=0.0, max_value=10.0, value=None, format="%0.4f")
 
-    # Dicionário com a estrutura ajustada
-    # Usamos uma verificação: se for None, enviamos np.nan (vazio) para o modelo.
+    st.markdown("---")
+    st.header("4. Indicadores Avançados")
+    with st.expander("Preencha se possuir os dados (Importante para a precisão)"):
+        col_adv1, col_adv2 = st.columns(2)
+        with col_adv1:
+            ipv = st.number_input("Indicador de Ponto de Virada (IPV)", min_value=0.0, max_value=10.0, value=None, format="%0.4f")
+        with col_adv2:
+            n_av = st.number_input("Número de Avaliações", min_value=0, max_value=50, value=None, step=1)
+
+    # Dicionário Final
     data = {
         'idade': idade,
         'genero': genero,
@@ -282,11 +294,11 @@ def get_user_input_features():
         'inde_2023': inde_2023 if inde_2023 is not None else np.nan,
         'inde_2024': str(inde_2024) if inde_2024 is not None else np.nan,
         
-        # Colunas faltantes tratadas pelo Imputer do seu Pipeline
-        'ipv': np.nan,            # Indicador de Ponto de Virada (vazio)
-        'ida': np.nan,            # Indicador de Desempenho Acadêmico (vazio)
-        'ano_ingresso': np.nan,   # Ano de ingresso (vazio)
-        'n_av': np.nan            # Número de avaliações (vazio)
+        # Variáveis cruciais agora recebem dados reais!
+        'ida': ida_calculado,
+        'ipv': ipv if ipv is not None else np.nan,
+        'n_av': n_av if n_av is not None else np.nan
+        
     }
     
     return pd.DataFrame(data, index=[0])
