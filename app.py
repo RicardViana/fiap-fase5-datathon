@@ -102,10 +102,10 @@ def traduzir_nomes_features(lista_nomes_tecnicos):
 
     mapa_nomes = {
         'num__idade': 'Idade do Aluno',
-        'num__inde_2024': 'Índice INDE (2024)',
+        'num__inde_2024': 'Índice INDE (Atual)',
         'num__media_academica': 'Média Acadêmica (Mat, Por, Ing)',
         'num__media_comportamental': 'Média Comportamental (IAA, IEG, IPS, IPP)',
-        'num__delta_inde': 'Evolução do INDE (23-22)',
+        'num__delta_inde': 'Evolução do INDE (Últimos 2 anos)',
         'num__fase_ideal': 'Fase Ideal',
         'cat__genero_masculino': 'Gênero (Masculino)',
         'cat__genero_feminino': 'Gênero (Feminino)'
@@ -223,71 +223,70 @@ def get_user_input_features():
     col1, col2, col3 = st.columns(3)
     with col1:
         idade = st.number_input("Idade", min_value=6, max_value=30, value=12)
+
     with col2:
         genero = st.selectbox("Gênero", ["Menino", "Menina"])
+
     with col3:
         fase = st.selectbox("Fase Ideal", ["Alfa", "Fase 1", "Fase 2", "Fase 3", "Fase 4", "Fase 5", "Fase 6", "Fase 7", "Fase 8"])
 
     st.markdown("---")
     st.header("2. Notas Acadêmicas")
+    st.write("Deixe em branco caso o aluno não possua a nota.")
     col_n1, col_n2, col_n3 = st.columns(3)
     with col_n1:
-        mat = st.number_input("Matemática (MAT)", min_value=0.0, max_value=10.0, value=7.0, step=0.1)
+        # Trocamos value=7.0 para value=None
+        mat = st.number_input("Matemática (MAT)", min_value=0.0, max_value=10.0, value=None, step=0.1)
+
     with col_n2:
-        por = st.number_input("Português (POR)", min_value=0.0, max_value=10.0, value=7.0, step=0.1)
+        por = st.number_input("Português (POR)", min_value=0.0, max_value=10.0, value=None, step=0.1)
+
     with col_n3:
-        ing = st.number_input("Inglês (ING)", min_value=0.0, max_value=10.0, value=7.0, step=0.1)
+        ing = st.number_input("Inglês (ING)", min_value=0.0, max_value=10.0, value=None, step=0.1)
 
     st.markdown("---")
     st.header("3. Indicadores (Comportamental e Geral)")
     col_i1, col_i2 = st.columns(2)
     with col_i1:
-        iaa = st.number_input("Ind. Autoavaliação (IAA)", min_value=0.0, max_value=10.0, value=7.5)
-        ieg = st.number_input("Ind. Engajamento (IEG)", min_value=0.0, max_value=10.0, value=7.5)
-        inde_2024 = st.number_input("INDE 2024", min_value=0.0, max_value=10.0, value=0.0)
+        iaa = st.number_input("Ind. Autoavaliação (IAA)", min_value=0.0, max_value=10.0, value=None)
+        ieg = st.number_input("Ind. Engajamento (IEG)", min_value=0.0, max_value=10.0, value=None)
+        inde_2024 = st.number_input("INDE Atual", min_value=0.0, max_value=10.0, value=None)
+
     with col_i2:
-        ips = st.number_input("Ind. Psicossocial (IPS)", min_value=0.0, max_value=10.0, value=7.5)
-        ipp = st.number_input("Ind. Psicopedagógico (IPP)", min_value=0.0, max_value=10.0, value=7.5)
+        ips = st.number_input("Ind. Psicossocial (IPS)", min_value=0.0, max_value=10.0, value=None)
+        ipp = st.number_input("Ind. Psicopedagógico (IPP)", min_value=0.0, max_value=10.0, value=None)
         
     with st.expander("Histórico de INDE (Opcional - para calcular evolução)"):
         col_h1, col_h2 = st.columns(2)
         with col_h1:
-            inde_2022 = st.number_input("INDE 2022", min_value=0.0, max_value=10.0, value=7.0)
+            # value=None permite que o campo fique vazio
+            inde_2022 = st.number_input("INDE de 2 anos atrás", min_value=0.0, max_value=10.0, value=None)
+
         with col_h2:
-            inde_2023 = st.number_input("INDE 2023", min_value=0.0, max_value=10.0, value=7.0)
+            inde_2023 = st.number_input("INDE do ano passado", min_value=0.0, max_value=10.0, value=None)
 
-    st.markdown("---")
-    st.header("4. Configuração do Modelo")
-    
-    ano_pede_escolhido = st.selectbox(
-        "Ano Base de Comparação (Baseline)", 
-        options=[2024, 2023, 2022],
-        help="O modelo foi treinado com dados históricos. Escolha com qual ano de referência deseja comparar o desempenho deste aluno."
-    )
-
-    # Dicionário com a estrutura igual ao DataFrame de treino
+    # Dicionário com a estrutura ajustada
+    # Usamos uma verificação: se for None, enviamos np.nan (vazio) para o modelo.
     data = {
         'idade': idade,
         'genero': genero,
         'fase_ideal': fase,
-        'mat': mat,
-        'por': por,
-        'ing': ing,
-        'iaa': iaa,
-        'ieg': ieg,
-        'ips': ips,
-        'ipp': ipp,
-        'inde_2022': inde_2022,
-        'inde_2023': inde_2023,
-        'inde_2024': str(inde_2024),
+        'mat': mat if mat is not None else np.nan,
+        'por': por if por is not None else np.nan,
+        'ing': ing if ing is not None else np.nan,
+        'iaa': iaa if iaa is not None else np.nan,
+        'ieg': ieg if ieg is not None else np.nan,
+        'ips': ips if ips is not None else np.nan,
+        'ipp': ipp if ipp is not None else np.nan,
+        'inde_2022': inde_2022 if inde_2022 is not None else np.nan,
+        'inde_2023': inde_2023 if inde_2023 is not None else np.nan,
+        'inde_2024': str(inde_2024) if inde_2024 is not None else np.nan,
         
-        # Colunas faltantes e serão tratadas pelo Imputer do seu Pipeline
-        'ano_pede': ano_pede_escolhido,    
+        # Colunas faltantes tratadas pelo Imputer do seu Pipeline
         'ipv': np.nan,            # Indicador de Ponto de Virada (vazio)
         'ida': np.nan,            # Indicador de Desempenho Acadêmico (vazio)
         'ano_ingresso': np.nan,   # Ano de ingresso (vazio)
-        'n_av': np.nan,           # Número de avaliações (vazio)
-        'Unnamed: 0': 0
+        'n_av': np.nan            # Número de avaliações (vazio)
     }
     
     return pd.DataFrame(data, index=[0])
@@ -303,7 +302,7 @@ def main():
     st.markdown("Analise o risco do aluno apresentar defasagem educacional (IAN <= 5) com base em seus indicadores.")
     
     if config:
-        st.caption(f"🤖 Modelo Ativo: **{config['best_model']}** | 🎚️ Threshold de Corte: **{config['threshold']:.2f}**")
+        st.caption(f"🤖 Modelo Ativo: **{config['best_model']}** | 🎚️ Limiete (Threshold) de Corte: **{config['threshold']:.2f}**")
     
     st.markdown("---")
 
