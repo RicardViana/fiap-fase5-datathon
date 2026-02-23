@@ -131,7 +131,7 @@ Foi desenvolvida uma aplicação em **Streamlit** para permitir que a Passos Má
 * Visualize classificação preditiva
 * Apoie tomada de decisão pedagógica
 
-Deploy realizado via Streamlit Community Cloud.
+Deploy realizado via Streamlit Community Cloud e podendo ser acessado através do [link](https://fiap-fase5-datathon.streamlit.app/)
 
 ---
 
