@@ -6,6 +6,7 @@ app_modelo.py
 /models/config_passos_magicos_Lucas.pkl
 /models/modelo_passos_magicos_Lucas.pkl
 /notebooks/Datathon_FIAP_Fase_5_Lucas.ipynb
+/.vscode
 
 # Mac OS-specific storage files
 .DS_Store
