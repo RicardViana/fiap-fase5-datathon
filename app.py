@@ -31,10 +31,14 @@ def coerce_numeric(s):
 def extrair_fase(valor):
     if pd.isna(valor):
         return np.nan
+    
     valor = str(valor).lower()
+
     if "alfa" in valor:
         return 0
+    
     m = re.search(r"fase\s*(\d+)", valor)
+
     if m:
         return int(m.group(1))
     return np.nan
@@ -48,12 +52,14 @@ def padronizar_genero(df):
             "menina": "feminino", "feminino": "feminino"
         }
         df["genero"] = df["genero"].map(map_genero)
+
     return df
 
 def padronizar_idade(df):
     df = df.copy()
     if "idade" not in df.columns:
         return df
+    
     s = df["idade"]
     dt = pd.to_datetime(s, errors="coerce")
     idade_from_date = np.where(dt.notna() & (dt.dt.year == 1900) & (dt.dt.month == 1), dt.dt.day, np.nan)
@@ -63,6 +69,7 @@ def padronizar_idade(df):
     idade_final.loc[mask] = idade_from_date[mask]
     idade_final = idade_final.where(idade_final.between(6, 30))
     df["idade"] = idade_final.round()
+
     return df
 
 def tratar_inde_2024(df):
@@ -71,6 +78,7 @@ def tratar_inde_2024(df):
         tmp = df["inde_2024"].astype(str).str.strip().str.upper()
         tmp = tmp.replace("INCLUIR", np.nan)
         df["inde_2024"] = coerce_numeric(tmp)
+
     return df
 
 def preparar_base_app(df):
@@ -312,11 +320,14 @@ def get_user_input_features():
 
 # Função principal
 def main():
+    
+    # Chamar funçaõ do sidebar
     configurar_sidebar()
     
     # Carregar Modelo e Configs
     model, config = load_models_and_config()
-
+    
+    # Titulo e subtitulo
     st.title("🎓 Previsão de Defasagem Educacional")
     st.markdown("Analise o risco do aluno apresentar defasagem educacional (IAN <= 5) com base em seus indicadores.")
     
@@ -330,16 +341,17 @@ def main():
 
     st.markdown("###")
     
+    # Realizar a predição
     if st.button("🔍 Realizar Predição", type="primary", use_container_width=True):
         if model is not None and config is not None:
             with st.spinner('Analisando dados...'):
                 try:
-                    # Aplicar o pré-processamento igualzinho ao Notebook
+                    # Aplicar o pré-processamento
                     processed_df = preparar_base_app(raw_input_df)
 
-                    # Pegar probabilidades
+                    # Salvar probabilidades
                     probability = model.predict_proba(processed_df)
-                    proba_risco = probability[0][1] # Probabilidade de ser classe 1 (Risco)
+                    proba_risco = probability[0][1]
                     
                     # Usar o Threshold do config para decidir
                     limiar = config['threshold']
@@ -372,6 +384,7 @@ def main():
                         - **Barras Azuis:** Fatores que **diminuem** o risco de defasagem.  
                         """)
 
+                    # Usar para mapear o shap
                     if validar_shap.lower() == 's' and df_map is not None:
                         st.markdown("---")
                         st.header("🕵️‍♀️ Debug: Variáveis")
