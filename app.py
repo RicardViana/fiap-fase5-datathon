@@ -16,14 +16,15 @@ import streamlit as st
 # Variável de debug
 validar_shap = 'n'
 
-# CONFIGURAÇÃO DA PÁGINA
+# Configuração da página
 st.set_page_config(
     page_title="Predição de Risco de Defasagem",
     page_icon="🎓",
-    layout="centered"
+    layout="centered",
+    initial_sidebar_state="collapsed"
 )
 
-# FUNÇÕES DE PREPARO DE DADOS
+# Funções de preparo de dados
 def coerce_numeric(s):
     return pd.to_numeric(s, errors="coerce")
 
@@ -81,7 +82,6 @@ def preparar_base_app(df):
     if "fase_ideal" in df.columns:
         df["fase_ideal"] = df["fase_ideal"].apply(extrair_fase)
 
-    # Features extras (Feature Engineering)
     cols_acad = [c for c in ["mat","por","ing"] if c in df.columns]
     if len(cols_acad) >= 2:
         df["media_academica"] = df[cols_acad].mean(axis=1)
@@ -95,7 +95,7 @@ def preparar_base_app(df):
 
     return df
 
-# DEFINIÇÃO DE FUNÇÕES DO APP
+# Definição de funções do app
 def traduzir_nomes_features(lista_nomes_tecnicos):
 
     """Traduz os nomes técnicos do Pipeline para Português legível."""
@@ -109,7 +109,6 @@ def traduzir_nomes_features(lista_nomes_tecnicos):
         'num__fase_ideal': 'Fase Ideal',
         'cat__genero_masculino': 'Gênero (Masculino)',
         'cat__genero_feminino': 'Gênero (Feminino)',
-        # Adicionadas as traduções para os indicadores avançados:
         'num__ida': 'Indicador de Desemp. Acad. (IDA)',
         'num__ipv': 'Indicador de Ponto de Virada (IPV)',
         'num__n_av': 'Número de Avaliações'
@@ -120,6 +119,7 @@ def traduzir_nomes_features(lista_nomes_tecnicos):
     for nome in lista_nomes_tecnicos:
         if nome in mapa_nomes:
             nomes_traduzidos.append(mapa_nomes[nome])
+
         else:
             limpo = nome.replace('num__', '').replace('cat__', '').replace('bin__', '').replace('_', ' ').title()
             nomes_traduzidos.append(limpo)
@@ -238,7 +238,6 @@ def get_user_input_features():
     st.header("2. Notas Acadêmicas")
     st.write("Deixe em branco caso o aluno não possua a nota.")
     col_n1, col_n2, col_n3 = st.columns(3)
-    
     with col_n1:
         mat = st.number_input("Matemática (MAT)", min_value=0.0, max_value=10.0, value=None, step=0.1, format="%0.4f")
 
@@ -271,26 +270,25 @@ def get_user_input_features():
     st.header("4. Indicadores Avançados")
     st.write("O IDA será calculado automaticamente com base nas notas, a menos que você digite um valor específico abaixo.")
     with st.expander("Preencha se possuir os dados (Importante para a precisão)"):
-        # Voltamos para 3 colunas para incluir o IDA
         col_adv1, col_adv2, col_adv3 = st.columns(3)
         with col_adv1:
             ida = st.number_input("Ind. Desemp. Acad. (IDA)", min_value=0.0, max_value=10.0, value=None, format="%0.4f")
+
         with col_adv2:
             ipv = st.number_input("Ponto de Virada (IPV)", min_value=0.0, max_value=10.0, value=None, format="%0.4f")
+
         with col_adv3:
             n_av = st.number_input("Nº de Avaliações", min_value=0, max_value=50, value=None, step=1)
 
-    # ==========================================================
-    # LÓGICA INTELIGENTE DO IDA (Digitado vs Calculado)
-    # ==========================================================
     if ida is not None:
-        ida_final = ida # Usa o que o usuário digitou na tela
-    elif mat is not None and por is not None and ing is not None:
-        ida_final = (mat + por + ing) / 3 # Calcula automaticamente
-    else:
-        ida_final = np.nan # Deixa vazio para o modelo inferir se faltar dados
+        ida_final = ida
 
-    # Dicionário Final
+    elif mat is not None and por is not None and ing is not None:
+        ida_final = (mat + por + ing) / 3
+
+    else:
+        ida_final = np.nan
+
     data = {
         'idade': idade,
         'genero': genero,
@@ -305,19 +303,17 @@ def get_user_input_features():
         'inde_2022': inde_2022 if inde_2022 is not None else np.nan,
         'inde_2023': inde_2023 if inde_2023 is not None else np.nan,
         'inde_2024': str(inde_2024) if inde_2024 is not None else np.nan,
-        
-        # Variáveis cruciais com a lógica aplicada
         'ida': ida_final, 
         'ipv': ipv if ipv is not None else np.nan,
         'n_av': n_av if n_av is not None else np.nan,
         
         # Correção do erro técnico
-        'ano_ingresso': np.nan 
+        #'ano_ingresso': np.nan 
     }
     
     return pd.DataFrame(data, index=[0])
 
-# FUNÇÃO PRINCIPAL
+# Função principal
 def main():
     configurar_sidebar()
     
