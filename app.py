@@ -306,9 +306,6 @@ def get_user_input_features():
         'ida': ida_final, 
         'ipv': ipv if ipv is not None else np.nan,
         'n_av': n_av if n_av is not None else np.nan,
-        
-        # Correção do erro técnico
-        #'ano_ingresso': np.nan 
     }
     
     return pd.DataFrame(data, index=[0])
