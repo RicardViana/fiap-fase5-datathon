@@ -34,15 +34,14 @@ O INDE é composto pelos seguintes indicadores:
 | Indicador | Descrição                         |
 | --------- | --------------------------------- |
 | **IAN**   | Indicador de Adequação de Nível   |
-| **IDA**   | Indicador de Desempenho Acadêmico |
+| **IDA**   | Indicador de Aprendizagem |
 | **IEG**   | Indicador de Engajamento          |
 | **IAA**   | Indicador de Autoavaliação        |
 | **IPS**   | Indicador Psicossocial            |
 | **IPP**   | Indicador Psicopedagógico         |
 | **IPV**   | Indicador de Ponto de Virada      |
 
-As fórmulas oficiais e conceitos estão descritos no documento técnico do PEDE  
-O dicionário detalhado das variáveis encontra-se no documento oficial 
+As fórmulas oficiais e conceitos estão descritos no documento técnico do PEDE e o dicionário detalhado das variáveis encontra-se no documento oficial 
 
 ---
 
@@ -54,12 +53,13 @@ Responder às questões propostas no briefing oficial :
 
 * Perfil de defasagem (IAN)
 * Evolução do desempenho acadêmico (IDA)
-* Relação entre engajamento (IEG) e desempenho
-* Coerência entre autoavaliação (IAA) e desempenho real
-* Impacto psicossocial (IPS) e psicopedagógico (IPP)
-* Fatores associados ao Ponto de Virada (IPV)
+* Relação entre engajamento (IEG) desempenho (IDA) e ponto de virada (IPV)
+* Coerência entre autoavaliação (IAA) desempenho real (IDA) e engajaento (IEG)
+* Padrões psicossocial (IPS) que antecedem quedas de desempenho ou engajamento
+* Aspectos psicopedagógico (IPP) para confirmar (ou contradizer) a defasagem (IAN)
+* Fatores associados ao Ponto de Virada (IPV) ao longo do tempo
 * Multidimensionalidade dos indicadores
-* Efetividade do programa ao longo das fases (Quartzo, Ágata, Ametista, Topázio)
+* Efetividade do programa ao longo das fases (Quartzo, Ágata, Ametista, Topázio)  
 
 ---
 
@@ -68,7 +68,7 @@ Responder às questões propostas no briefing oficial :
 Desenvolver um modelo capaz de:
 
 ✔ Identificar risco de defasagem antes da queda do desempenho  
-✔ Estimar probabilidade individual de risco  
+✔ Estimar probabilidade individual de risco de defasagem
 ✔ Apoiar decisões pedagógicas preventivas  
 
 ---
