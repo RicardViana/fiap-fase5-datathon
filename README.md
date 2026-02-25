@@ -201,19 +201,6 @@ Foi realizado ajuste do ponto de corte com base no trade-off entre Precision e R
 
 ---
 
-# 🔥 Por que essa versão é mais forte?
-
-Ela mostra claramente que vocês:
-
-✔ Evitaram vazamento
-✔ Fizeram split temporal (isso impressiona banca)
-✔ Compararam múltiplos modelos
-✔ Usaram métricas adequadas para desbalanceamento
-✔ Ajustaram threshold estrategicamente
-✔ Pensaram em generalização real
-
----
-
 ## 📊 5. Principais Insights
 
 * Em desenvolvimento
