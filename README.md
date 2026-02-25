@@ -3,7 +3,7 @@
 ## 🧠 Modelo Preditivo de Risco de Defasagem Educacional
 
 [![CCDS](https://img.shields.io/badge/CCDS-Project%20template-328F97?logo=cookiecutter)](https://cookiecutter-data-science.drivendata.org/) 
-![Python](https://img.shields.io/badge/Python-3.9-blue) 
+![Python](https://img.shields.io/badge/Python-3.10-blue) 
 ![Status](https://img.shields.io/badge/Status-Em%20Desenvolvimento-yellow)
 
 ## 📌 1. Introdução
@@ -169,24 +169,26 @@ Aplicação disponível em:
 ## 📂 7. Estrutura do Repositório
 
 ```
-├── app.py
-├── notebooks/
-│   └── Datathon_FIAP_Fase_5.ipynb
-├── models/
-│   ├── modelo_passos_magicos.pkl
-│   └── config_passos_magicos.pkl
+├── .streamlit/
 ├── data/
 │   ├── raw/
 │   ├── processed/
 │   └── interim/
+├── docs/
+├── models/
+│   ├── modelo_passos_magicos.pkl
+│   └── config_passos_magicos.pkl
+├── notebooks/
+│   └── Datathon_FIAP_Fase_5.ipynb
 ├── references/
 │   ├── Dicionário Dados Datathon.pdf
 │   ├── PEDE_ Pontos importantes.docx
 │   └── POSTECH - DTAT - Datathon - Fase 5.pdf
-├── requirements.txt
-└── README.md
+├── reports/
+├── app.py
+├── pyproject.toml
+└── requirements.txt
 ```
-
 ---
 
 ## 📚 8. Documentação Técnica
@@ -195,10 +197,7 @@ A documentação completa inclui:
 
 * Dicionário de variáveis
 * Fórmulas oficiais dos indicadores
-* Pipeline de modelagem
-* Estratégia de validação
 * Critério de definição de risco
-* Explicabilidade com SHAP
 
 ---
 
