@@ -1,198 +1,229 @@
-# 🧠 Modelo para Análise de Risco de Defasagem
+# 🎓 Datathon FIAP – Fase 5
+
+## 🧠 Modelo Preditivo de Risco de Defasagem Educacional
 
 [![CCDS](https://img.shields.io/badge/CCDS-Project%20template-328F97?logo=cookiecutter)](https://cookiecutter-data-science.drivendata.org/) 
 ![Python](https://img.shields.io/badge/Python-3.9-blue) 
 ![Status](https://img.shields.io/badge/Status-Em%20Desenvolvimento-yellow)
 
----
+## 📌 1. Introdução
 
-## 📋 Sobre o Projeto
+Este projeto foi desenvolvido no contexto do **Datathon – Fase 5** da Pós-Tech em Data Analytics (FIAP | POSTECH).
 
-Este projeto foi desenvolvido no contexto do **Datathon – Fase 5**, promovido pela Pós-Tech em Data Analytics, utilizando a base de dados educacionais da Associação **Passos Mágicos**.
+O desafio consiste em analisar dados educacionais da **Associação Passos Mágicos**, organização com mais de 30 anos de atuação na transformação da vida de crianças e jovens em situação de vulnerabilidade social por meio da educação.
 
-A proposta consiste em realizar uma análise exploratória e preditiva sobre indicadores educacionais e psicossociais de alunos em situação de vulnerabilidade social, com o objetivo de:
+A proposta do trabalho foi:
 
-* Identificar padrões de defasagem
-* Analisar evolução de desempenho ao longo dos anos
-* Construir um modelo preditivo de risco
-* Apoiar decisões estratégicas da instituição
-
----
-
-## 🏥 Contexto do Problema
-
-A Associação Passos Mágicos atua há mais de 30 anos transformando a vida de crianças e jovens por meio da educação.
-
-O desafio proposto no Datathon envolve analisar dados educacionais dos anos de:
-
-* 2022
-* 2023
-* 2024
-
-Os indicadores analisados incluem:
-
-* **IAN** – Índice de Adequação de Nível
-* **IDA** – Índice de Desempenho Acadêmico
-* **IEG** – Índice de Engajamento
-* **IAA** – Índice de Autoavaliação
-* **IPS** – Índice Psicossocial
-* **IPP** – Índice Psicopedagógico
-* **IPV** – Índice de Ponto de Virada
-* **INDE** – Índice Global do Aluno
-
-O objetivo central foi responder às dores de negócio e desenvolver um modelo capaz de prever o risco de defasagem antes que ele aconteça.
+* Realizar análise exploratória dos indicadores educacionais (2022–2024)
+* Responder às dores de negócio apresentadas no briefing
+* Construir um modelo preditivo de risco de defasagem
+* Desenvolver uma aplicação em Streamlit para uso prático da instituição
 
 ---
 
-## 🎯 Objetivos do Projeto
+## 🏫 2. Contexto do Negócio
 
-### 🔎 Análise Exploratória
+A Associação Passos Mágicos realiza a **Pesquisa Extensiva do Desenvolvimento Educacional (PEDE)**, que consolida indicadores multidimensionais dos alunos.
 
-* Avaliar a evolução do IAN ao longo do tempo
-* Identificar tendências no IDA
-* Verificar relação entre engajamento (IEG) e desempenho (IDA/IPV)
-* Analisar coerência entre autoavaliação (IAA) e desempenho real
-* Investigar padrões psicossociais (IPS) associados à queda de desempenho
-* Avaliar multidimensionalidade dos indicadores
+O índice global utilizado é o:
+
+### 🔎 INDE – Índice de Desenvolvimento Educacional
+
+O INDE é composto pelos seguintes indicadores:
+
+| Indicador | Descrição                         |
+| --------- | --------------------------------- |
+| **IAN**   | Indicador de Adequação de Nível   |
+| **IDA**   | Indicador de Desempenho Acadêmico |
+| **IEG**   | Indicador de Engajamento          |
+| **IAA**   | Indicador de Autoavaliação        |
+| **IPS**   | Indicador Psicossocial            |
+| **IPP**   | Indicador Psicopedagógico         |
+| **IPV**   | Indicador de Ponto de Virada      |
+
+As fórmulas oficiais e conceitos estão descritos no documento técnico do PEDE  
+O dicionário detalhado das variáveis encontra-se no documento oficial 
+
+---
+
+## 🎯 3. Objetivos do Projeto
+
+### 📊 Análise Exploratória
+
+Responder às questões propostas no briefing oficial :
+
+* Perfil de defasagem (IAN)
+* Evolução do desempenho acadêmico (IDA)
+* Relação entre engajamento (IEG) e desempenho
+* Coerência entre autoavaliação (IAA) e desempenho real
+* Impacto psicossocial (IPS) e psicopedagógico (IPP)
+* Fatores associados ao Ponto de Virada (IPV)
+* Multidimensionalidade dos indicadores
+* Efetividade do programa ao longo das fases (Quartzo, Ágata, Ametista, Topázio)
+
+---
 
 ### 🤖 Modelagem Preditiva
 
-* Criar variável target de risco de defasagem
-* Realizar feature engineering
-* Separar dados em treino e teste
-* Treinar modelo de **Perceptron de Múltiplas Camadas (MLPClassifier)**
-* Avaliar métricas de desempenho
-* Gerar probabilidade de risco para cada aluno
+Desenvolver um modelo capaz de:
+
+✔ Identificar risco de defasagem antes da queda do desempenho  
+✔ Estimar probabilidade individual de risco  
+✔ Apoiar decisões pedagógicas preventivas  
 
 ---
 
-## 🧪 Metodologia
+## 🧪 4. Metodologia
 
-A modelagem seguiu as seguintes etapas:
-
-### 1️⃣ Pré-processamento
+### 4.1 Preparação dos Dados
 
 * Tratamento de valores ausentes
-* Padronização com `StandardScaler`
-* Seleção de variáveis relevantes
+* Padronização de variáveis
+* Conversão de fases em valores numéricos
+* Engenharia de atributos:
 
-### 2️⃣ Feature Engineering
+  * Média acadêmica
+  * Média comportamental
+  * Evolução do INDE
+  * Indicadores derivados
 
-* Criação de variável binária de risco
-* Combinação de indicadores multidimensionais
-* Normalização dos dados
+---
 
-### 3️⃣ Separação dos Dados
+### 4.2 Definição da Variável Target
+
+O risco de defasagem foi definido com base em:
+
+```
+IAN <= 5  → Risco de Defasagem
+```
+
+---
+
+### 4.3 Separação dos Dados
 
 * `train_test_split`
 * Estratificação da variável target
+* Padronização via `StandardScaler`
 
-### 4️⃣ Modelagem
+---
 
-Foi utilizado:
+### 4.4 Modelagem
+
+Foram testados diferentes algoritmos, sendo selecionado o modelo com melhor performance validada.
+
+O modelo final é carregado na aplicação via:
 
 ```python
-MLPClassifier(hidden_layer_sizes=(100, 50),
-              activation='relu',
-              solver='adam',
-              max_iter=500,
-              random_state=42)
+joblib.load("models/modelo_passos_magicos.pkl")
 ```
 
-Modelo baseado em rede neural artificial (Perceptron Multicamadas).
+A configuração do melhor modelo e threshold também é carregada via arquivo `.pkl`.
 
-### 5️⃣ Avaliação
+---
+
+### 4.5 Avaliação
+
+Métricas utilizadas:
 
 * Accuracy
 * Precision
 * Recall
 * F1-Score
 * Matriz de Confusão
-* Análise de probabilidade de risco
+* Curva ROC
+* Análise de Threshold Ótimo
 
 ---
 
-## 📊 Principais Insights Analíticos
+## 📊 5. Principais Insights
 
-* Alunos com **baixo IEG + baixo IPS** apresentam maior probabilidade de queda no IDA.
-* Existe correlação moderada entre IAA e desempenho real.
-* O IPV é fortemente influenciado por engajamento contínuo.
-* A combinação **IDA + IEG + IPS** é um forte preditor do INDE.
-* Padrões psicossociais antecedem quedas acadêmicas.
-
----
-
-## 🚀 Aplicação no Streamlit
-
-Foi desenvolvida uma aplicação em **Streamlit** para permitir que a Passos Mágicos:
-
-* Insira indicadores do aluno
-* Obtenha probabilidade de risco
-* Visualize classificação preditiva
-* Apoie tomada de decisão pedagógica
-
-Deploy realizado via Streamlit Community Cloud e podendo ser acessado através do [link](https://fiap-fase5-datathon.streamlit.app/)
+* Baixo engajamento (IEG) antecede quedas no desempenho (IDA)
+* IPS reduzido está associado a maior risco de defasagem
+* A combinação IDA + IEG + IPS é forte preditor do INDE
+* Autoavaliação (IAA) apresenta correlação moderada com desempenho real
+* A evolução do INDE (delta_inde) melhora capacidade preditiva
 
 ---
 
-## 📈 Estrutura do Projeto
+## 💻 6. Aplicação em Streamlit
 
-A organização segue o padrão **Cookiecutter Data Science**, adaptado ao Datathon:
+Foi desenvolvida uma aplicação interativa utilizando **Streamlit**.
+
+### 🔹 Funcionalidades:
+
+* Inserção manual dos indicadores do aluno
+* Cálculo automático de IDA (quando aplicável)
+* Probabilidade de risco de defasagem
+* Classificação baseada em threshold otimizado
+* Explicabilidade com SHAP (quando aplicável ao modelo)
+* Recomendações pedagógicas automáticas
+
+### 🌐 Deploy
+
+Aplicação disponível em:
+
+🔗 [https://fiap-fase5-datathon.streamlit.app/](https://fiap-fase5-datathon.streamlit.app/)
+
+---
+
+## 📂 7. Estrutura do Repositório
 
 ```
-├── .streamlit/
-│   └── config.toml
+├── app.py
+├── notebooks/
+│   └── Datathon_FIAP_Fase_5.ipynb
+├── models/
+│   ├── modelo_passos_magicos.pkl
+│   └── config_passos_magicos.pkl
 ├── data/
 │   ├── raw/
 │   ├── processed/
-│   ├── interim/
-│   └── external/
-├── docs/
-├── models/
-│   └── modelo_risco_defasagem_mlp.joblib
-├── notebooks/
-│   └── Perceptron de múltiplas camadas.ipynb
+│   └── interim/
 ├── references/
+│   ├── Dicionário Dados Datathon.pdf
+│   ├── PEDE_ Pontos importantes.docx
 │   └── POSTECH - DTAT - Datathon - Fase 5.pdf
-├── reports/
-├── app.py
 ├── requirements.txt
 └── README.md
 ```
 
 ---
 
-## 📘 Documentação
+## 📚 8. Documentação Técnica
 
-A documentação técnica inclui:
+A documentação completa inclui:
 
-* Explicação das variáveis
+* Dicionário de variáveis
+* Fórmulas oficiais dos indicadores
 * Pipeline de modelagem
 * Estratégia de validação
-* Justificativa da escolha do modelo MLP
+* Critério de definição de risco
+* Explicabilidade com SHAP
 
 ---
 
-## 👨‍💻 Equipe
+## 👨‍💻 9. Equipe
 
 * [Elton José Araujo Silva](https://www.linkedin.com/in/elton-araujo-silva/)
 * [Leonardo Fajoli Formigon](https://www.linkedin.com/in/leonardo-formigon-63052320b/)
 * [Lucas Augusto Fernandes de Lira](https://www.linkedin.com/in/lucas--lira-/)
 * [Mariana Domingues Brandão](https://www.linkedin.com/in/maridbrandao)
 * [Ricardo Vieira Viana](https://www.linkedin.com/in/ricardvviana)
+
 ---
 
-## 📌 Conclusão
+## 🌍 10. Impacto Social
 
-O modelo desenvolvido permite:
+Este projeto demonstra como:
 
-* Antecipar risco de defasagem
-* Apoiar decisões pedagógicas
-* Identificar padrões críticos
-* Gerar impacto social real
+* Ciência de Dados aplicada ao terceiro setor
+* Modelos preditivos com interpretabilidade
+* Analytics orientado a impacto social
 
-O projeto combina **análise estatística, storytelling e Machine Learning aplicado ao terceiro setor**, reforçando o papel da ciência de dados como ferramenta de transformação social.
+podem auxiliar na transformação educacional de jovens em vulnerabilidade.
+
+---
 
 ## 📜 Licença
 
-Este projeto é distribuído sob a licença MIT. Consulte o arquivo `LICENSE` para mais informações.
+Este projeto está sob licença MIT.
