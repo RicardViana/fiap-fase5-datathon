@@ -27,7 +27,7 @@ A Associação Passos Mágicos realiza a **Pesquisa Extensiva do Desenvolvimento
 
 O índice global utilizado é o:
 
-### 🔎 INDE – Índice de Desenvolvimento Educacional
+### 🔎 Índice de Desenvolvimento Educacional (INDE)
 
 O INDE é composto pelos seguintes indicadores:
 
@@ -137,6 +137,7 @@ Métricas utilizadas:
 
 ## 📊 5. Principais Insights
 
+* Em desenvolvimento
 
 ---
 
@@ -174,7 +175,7 @@ Aplicação disponível em:
         ├── base_processada.xlsx
         └── idacao_app_passos_magicos.xlsx
 │   └── raw/
-        └── idacao_app_passos_magicos.xlsx
+        └── BASE DE DADOS PEDE 2024 - DATATHON.xlsx
 ├── docs/
 ├── models/
 │   ├── modelo_passos_magicos.pkl
@@ -183,9 +184,12 @@ Aplicação disponível em:
 │   └── Datathon_FIAP_Fase_5.ipynb
 ├── references/
 │   ├── Dicionário Dados Datathon.pdf
-│   ├── PEDE_ Pontos importantes.docx
+    ├── PEDE_ Pontos importantes.docx
 │   └── POSTECH - DTAT - Datathon - Fase 5.pdf
 ├── reports/
+├── .gitignore
+├── LICENSE
+├── README.md
 ├── app.py
 ├── pyproject.toml
 └── requirements.txt
