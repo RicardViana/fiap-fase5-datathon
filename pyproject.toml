@@ -19,5 +19,9 @@ dependencies = [
     "tqdm",
     "shap",
     "ipykernel",
-    "python-dotenv"
+    "python-dotenv",
+    "mkdocs",
+    "mkdocs-material",
+    "mkdocstrings[python]",
+    "mkdocs-jupyter"
 ]
