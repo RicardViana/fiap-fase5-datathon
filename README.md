@@ -137,11 +137,6 @@ Métricas utilizadas:
 
 ## 📊 5. Principais Insights
 
-* Baixo engajamento (IEG) antecede quedas no desempenho (IDA)
-* IPS reduzido está associado a maior risco de defasagem
-* A combinação IDA + IEG + IPS é forte preditor do INDE
-* Autoavaliação (IAA) apresenta correlação moderada com desempenho real
-* A evolução do INDE (delta_inde) melhora capacidade preditiva
 
 ---
 
@@ -170,10 +165,16 @@ Aplicação disponível em:
 
 ```
 ├── .streamlit/
+    ├── config.toml
 ├── data/
-│   ├── raw/
+    ├── external/
+│   ├── interim/
 │   ├── processed/
-│   └── interim/
+        ├── Base de Dados PEDE.xlsx
+        ├── base_processada.xlsx
+        └── idacao_app_passos_magicos.xlsx
+│   └── raw/
+        └── idacao_app_passos_magicos.xlsx
 ├── docs/
 ├── models/
 │   ├── modelo_passos_magicos.pkl
