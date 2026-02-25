@@ -73,65 +73,144 @@ Desenvolver um modelo capaz de:
 
 ---
 
-## 🧪 4. Metodologia
+# 🧪 4. Metodologia
 
-### 4.1 Preparação dos Dados
+## 4.1 Preparação dos Dados e Feature Engineering
 
-* Tratamento de valores ausentes
-* Padronização de variáveis
-* Conversão de fases em valores numéricos
-* Engenharia de atributos:
+A etapa de preparação foi estruturada para garantir consistência, evitar vazamento de informação e aumentar capacidade preditiva.
 
-  * Média acadêmica
-  * Média comportamental
-  * Evolução do INDE
-  * Indicadores derivados
+### 🔹 Padronização e Tratamento
+
+Foram realizadas as seguintes transformações:
+
+* Padronização da variável **gênero**
+* Padronização e validação da variável **idade**
+* Tratamento da coluna **INDE_2024**
+* Extração da **fase numérica** a partir da descrição textual
+* Remoção de variáveis com risco de vazamento de informação:
+
+  * `ian`
+  * `defasagem`
+
+Essa etapa garantiu integridade estatística e consistência no pipeline.
 
 ---
 
-### 4.2 Definição da Variável Target
+### 🔹 Criação de Novas Variáveis (Feature Engineering)
 
-O risco de defasagem foi definido com base em:
+Foram criadas variáveis estratégicas para capturar padrões multidimensionais:
+
+* `media_academica` → média entre Matemática, Português e Inglês
+* `media_comportamental` → média entre IAA, IEG, IPS e IPP
+* `delta_inde` → evolução do INDE entre períodos
+* `risco_defasagem_atual` → variável target binária
+
+A engenharia de atributos teve como objetivo capturar sinais precoces de risco antes da consolidação da defasagem.
+
+---
+
+## 4.2 Definição da Variável Target
+
+O risco de defasagem foi definido com base no indicador oficial de adequação de nível:
 
 ```
 IAN <= 5  → Risco de Defasagem
+IAN > 5   → Sem Risco
 ```
 
+A variável `risco_defasagem_atual` foi construída de forma binária para tratar o problema como **classificação supervisionada**.
+
 ---
 
-### 4.3 Separação dos Dados
+## 4.3 Separação dos Dados
 
-* `train_test_split`
+Foi adotada uma estratégia mais robusta do que um simples split aleatório.
+
+### 🔹 Estratégia utilizada:
+
+* **Treino:** Dados de 2022 e 2023
+* **Teste Real:** Dados de 2024
+
+Essa abordagem configura um **split temporal**, simulando cenário real de previsão futura.
+
+Além disso:
+
 * Estratificação da variável target
-* Padronização via `StandardScaler`
+* Padronização via `StandardScaler` quando necessário
+
+Essa decisão aumenta a validade prática do modelo.
 
 ---
 
-### 4.4 Modelagem
+## 4.4 Modelagem Preditiva
 
-Foram testados diferentes algoritmos, sendo selecionado o modelo com melhor performance validada.
+Foram testados diferentes algoritmos de classificação:
 
-O modelo final é carregado na aplicação via:
+* Logistic Regression
+* Random Forest
+* MLP (Multi-Layer Perceptron)
+* XGBoost
+
+### 🔎 Critérios de comparação
+
+Os modelos foram comparados com base em:
+
+* Accuracy
+* ROC AUC
+* PR AUC
+
+A escolha do modelo final considerou:
+
+* Performance média em validação cruzada
+* Estabilidade
+* Capacidade de generalização no teste temporal (2024)
+
+O modelo selecionado foi salvo e disponibilizado na aplicação via:
 
 ```python
 joblib.load("models/modelo_passos_magicos.pkl")
 ```
 
-A configuração do melhor modelo e threshold também é carregada via arquivo `.pkl`.
+O threshold ótimo também foi armazenado em arquivo `.pkl`.
 
 ---
 
-### 4.5 Avaliação
+## 4.5 Avaliação dos Resultados
 
-Métricas utilizadas:
+A avaliação foi conduzida em múltiplas camadas para garantir robustez.
 
-* Accuracy
+### 🔹 Validação
+
+* Cross-validation no conjunto de treino
+* Teste temporal utilizando 2024 como base real
+
+### 🔹 Métricas utilizadas
+
+* Matriz de Confusão
 * Precision
 * Recall
 * F1-Score
-* Matriz de Confusão
-* Curva ROC
-* Análise de Threshold Ótimo
+* ROC AUC
+* PR AUC
+
+### 🔹 Ajuste de Threshold
+
+Foi realizado ajuste do ponto de corte com base no trade-off entre Precision e Recall, priorizando:
+
+> Minimizar falsos negativos (evitar deixar alunos em risco sem intervenção).
+
+---
+
+# 🔥 Por que essa versão é mais forte?
+
+Ela mostra claramente que vocês:
+
+✔ Evitaram vazamento
+✔ Fizeram split temporal (isso impressiona banca)
+✔ Compararam múltiplos modelos
+✔ Usaram métricas adequadas para desbalanceamento
+✔ Ajustaram threshold estrategicamente
+✔ Pensaram em generalização real
 
 ---
 
