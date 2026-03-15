@@ -203,7 +203,33 @@ Foi realizado ajuste do ponto de corte com base no trade-off entre Precision e R
 
 ## 📊 5. Principais Insights
 
-* Em desenvolvimento
+A análise exploratória e a modelagem preditiva revelaram padrões fundamentais sobre a jornada dos alunos na Associação Passos Mágicos:
+
+### 🔹 5.1 Evolução e Impacto do Programa
+
+* **Melhora na Adequação de Nível (IAN):** Observou-se uma trajetória de crescimento consistente no nível médio de IAN, saltando de **6.42 em 2022** para **7.68 em 2024**. Isso indica que as intervenções de reforço são eficazes na correção da defasagem escolar severa e moderada.
+
+* **Desempenho Acadêmico (IDA):** O desempenho médio apresenta crescimento conforme o aluno progride entre as fases (ex: de Ágata para Ametista), validando que o modelo de ensino eleva o patamar de notas ao longo dos anos.
+
+* **Efetividade Consolidada:** Os indicadores mostram uma "movimentação lateralizada" positiva, mantendo a média dos alunos na classificação **Ametista** (notas entre 6,86 e 8,23), o que comprova o impacto real e mensurável do programa.
+
+### 🔹 5.2 Correlações Multidimensionais
+
+* **Engajamento como Motor:** Existe uma correlação direta e positiva entre o Indicador de Engajamento (IEG) e o Desempenho Acadêmico (IDA). Alunos com alta participação têm maior probabilidade de atingir o **Ponto de Virada (IPV)**.
+
+* **Equilíbrio Holístico:** A análise provou que a nota global (INDE) é maximizada quando há equilíbrio entre as quatro dimensões: Técnica (IDA), Participação (IEG), Bem-estar (IPS) e Psicopedagógico (IPP).
+
+* **Alerta Emocional:** Identificou-se que quedas na autoconfiança (IAA) e padrões psicossociais (IPS) negativos costumam preceder quedas no rendimento acadêmico, servindo como "avisos antecipados".
+
+### 🔹 5.3 Performance do Modelo Preditivo
+
+O modelo foi treinado para identificar alunos em risco de defasagem (IAN $\le$ 5), apresentando os seguintes resultados técnicos:
+
+* **Capacidade Preditiva:** O modelo alcançou uma **Acurácia de 61%** e um **ROC AUC de 0.64**, demonstrando capacidade de distinguir alunos em risco em um cenário temporal real (base 2024).
+
+* **Variáveis mais Influentes:** As variáveis que mais pesam na previsão de risco são, em ordem de importância: **INDE dos anos anteriores, Ponto de Virada (IPV), Desempenho Acadêmico (IDA) e Engajamento (IEG)**.
+
+* **Foco no Recall:** O modelo mantém um equilíbrio de **Recall de 0.62** para a classe de risco (1), garantindo que a maioria dos alunos vulneráveis seja identificada para intervenção pedagógica proativa.
 
 ---
 
