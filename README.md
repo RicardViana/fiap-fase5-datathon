@@ -268,17 +268,18 @@ Aplicação disponível em:
         └── idacao_app_passos_magicos.xlsx
 │   └── raw/
         └── BASE DE DADOS PEDE 2024 - DATATHON.xlsx
-├── docs/
 ├── models/
 │   ├── modelo_passos_magicos.pkl
 │   └── config_passos_magicos.pkl
 ├── notebooks/
-│   └── Datathon_FIAP_Fase_5.ipynb
+│   └── Challenger_05.ipynb
+    └── Datathon_FIAP_Fase_5.ipynb
 ├── references/
 │   ├── Dicionário Dados Datathon.pdf
     ├── PEDE_ Pontos importantes.docx
 │   └── POSTECH - DTAT - Datathon - Fase 5.pdf
 ├── reports/
+    └── Report FIAP - Case Passos Mágicos.pdf
 ├── .gitignore
 ├── LICENSE
 ├── README.md
