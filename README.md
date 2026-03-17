@@ -68,7 +68,7 @@ Responder às questões propostas no briefing oficial :
 Desenvolver um modelo capaz de:
 
 ✔ Identificar risco de defasagem antes da queda do desempenho  
-✔ Estimar probabilidade individual de risco de defasagem
+✔ Estimar probabilidade individual de risco de defasagem  
 ✔ Apoiar decisões pedagógicas preventivas  
 
 ---
